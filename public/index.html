@@ -46,10 +46,6 @@
           <svg class="icon"><use href="#icon-user"/></svg>
           Web Access
         </button>
-        <button class="auth-tab" data-tab="google">
-          <svg class="icon"><use href="#icon-google"/></svg>
-          Google Sign-In
-        </button>
         <button class="auth-tab" data-tab="token">
           <svg class="icon"><use href="#icon-spark"/></svg>
           AniList Token
@@ -59,7 +55,7 @@
       <!-- Tab 1: Username / Web Access Import -->
       <div class="auth-tab-content active" id="tabUsername">
         <h2 class="modal-title">Web AniList Access</h2>
-        <p class="modal-subtitle">Instant web access! Enter any AniList username or profile URL to load anime &amp; manga immediately.</p>
+        <p class="modal-subtitle">Instant web access! Enter any AniList username or profile link to load all lists (Completed, Watching, Dropped, Planning, Paused).</p>
 
         <div class="token-input-row">
           <input type="text" id="usernameInput" placeholder="AniList Username or URL (e.g. gigguk, LOST-4EVER)" autocomplete="off" spellcheck="false">
@@ -68,29 +64,10 @@
             Load List
           </button>
         </div>
-        <p class="modal-hint">No password or token required for public AniList collections!</p>
+        <p class="modal-hint">No password required for public AniList profiles!</p>
       </div>
 
-      <!-- Tab 2: Google Sign-In -->
-      <div class="auth-tab-content" id="tabGoogle">
-        <h2 class="modal-title">Sign in with Google</h2>
-        <p class="modal-subtitle">Save and sync your tier lists securely with your Google profile across all web sessions.</p>
-
-        <button class="btn-google-login" id="googleSignInBtn">
-          <svg class="icon"><use href="#icon-google"/></svg>
-          Continue with Google
-        </button>
-
-        <div class="google-custom-box" style="margin-top: 16px;">
-          <p class="modal-hint center">Or set your Google display profile name:</p>
-          <div class="token-input-row">
-            <input type="text" id="googleNameInput" placeholder="Your Name or Email" autocomplete="off" spellcheck="false">
-            <button class="btn-primary" id="googleConnectBtn">Save Profile</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab 3: Token OAuth -->
+      <!-- Tab 2: Token OAuth -->
       <div class="auth-tab-content" id="tabToken">
         <h2 class="modal-title">AniList Token Authorization</h2>
         <p class="modal-subtitle">Connect via official AniList OAuth token for private lists and account sync.</p>
@@ -291,10 +268,20 @@
 
     <div class="unranked-section" id="unrankedSection">
       <div class="unranked-header">
-        <h3 class="section-title">
-          <svg class="icon"><use href="#icon-star"/></svg>
-          Unranked <span class="unranked-badge" id="unrankedCountBadge">0</span>
-        </h3>
+        <div class="unranked-header-left">
+          <h3 class="section-title">
+            <svg class="icon"><use href="#icon-star"/></svg>
+            AniList Unranked Collection <span class="unranked-badge" id="unrankedCountBadge">0</span>
+          </h3>
+          <div class="status-filters" id="bottomStatusFilters">
+            <button class="filter-pill active" data-status="ALL" id="pill-ALL">All <span class="pill-count" id="count-ALL">0</span></button>
+            <button class="filter-pill" data-status="COMPLETED" id="pill-COMPLETED">Completed <span class="pill-count" id="count-COMPLETED">0</span></button>
+            <button class="filter-pill" data-status="CURRENT" id="pill-CURRENT">Watching/Reading <span class="pill-count" id="count-CURRENT">0</span></button>
+            <button class="filter-pill" data-status="PLANNING" id="pill-PLANNING">Planning <span class="pill-count" id="count-PLANNING">0</span></button>
+            <button class="filter-pill" data-status="PAUSED" id="pill-PAUSED">Paused <span class="pill-count" id="count-PAUSED">0</span></button>
+            <button class="filter-pill" data-status="DROPPED" id="pill-DROPPED">Dropped <span class="pill-count" id="count-DROPPED">0</span></button>
+          </div>
+        </div>
         <div class="unranked-actions">
           <select id="unrankedSortSelect" class="sort-select">
             <option value="default">Sort: Default</option>

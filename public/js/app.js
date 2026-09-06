@@ -146,7 +146,6 @@
         const target = tab.dataset.tab;
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
         document.getElementById('tabUsername').classList.toggle('active', target === 'username');
-        document.getElementById('tabGoogle').classList.toggle('active', target === 'google');
         document.getElementById('tabToken').classList.toggle('active', target === 'token');
       });
     });
@@ -156,34 +155,10 @@
       switchToUsernameBtn.addEventListener('click', () => {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'username'));
         document.getElementById('tabUsername').classList.add('active');
-        document.getElementById('tabGoogle').classList.remove('active');
         document.getElementById('tabToken').classList.remove('active');
         document.getElementById('usernameInput')?.focus();
       });
     }
-
-    // Google Sign-In Handler
-    const googleSignInBtn = document.getElementById('googleSignInBtn');
-    const googleConnectBtn = document.getElementById('googleConnectBtn');
-    const googleNameInput = document.getElementById('googleNameInput');
-
-    const doGoogleSignIn = (profileName) => {
-      const name = (profileName || googleNameInput?.value || 'Google User').trim();
-      state.user = {
-        id: 'google-' + Date.now(),
-        name: name,
-        avatar: { large: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80' },
-        isGoogle: true
-      };
-      state.username = name;
-      persistState();
-      updateUserUI();
-      hideLoginModal();
-      showToast(`Signed in as ${name}`);
-    };
-
-    if (googleSignInBtn) googleSignInBtn.addEventListener('click', () => doGoogleSignIn());
-    if (googleConnectBtn) googleConnectBtn.addEventListener('click', () => doGoogleSignIn());
 
     // Username / Web Access Import Handler (Modal)
     const usernameInput = document.getElementById('usernameInput');
@@ -194,7 +169,7 @@
       let s = String(raw).trim();
       if (s.includes('anilist.co/user/')) {
         const m = s.match(/anilist\.co\/user\/([^\/\?#]+)/i);
-        if (m && m[1]) return m[1];
+        if (m && m[1]) return decodeURIComponent(m[1]);
       }
       return s;
     }
@@ -478,7 +453,10 @@
       state.username = user.name;
 
       const lists = result.data?.MediaListCollection?.lists || [];
-      const entries = lists.flatMap(l => l.entries || []);
+      const entries = lists.flatMap(l => (l.entries || []).map(e => ({
+        ...e,
+        listStatus: e.status || l.status || 'COMPLETED'
+      })));
 
       processRawEntries(entries);
       updateUserUI();
@@ -538,7 +516,10 @@
     .then(r => r.json())
     .then(result => {
       const lists = result.data?.MediaListCollection?.lists || [];
-      const entries = lists.flatMap(l => l.entries || []);
+      const entries = lists.flatMap(l => (l.entries || []).map(e => ({
+        ...e,
+        listStatus: e.status || l.status || 'COMPLETED'
+      })));
       processRawEntries(entries);
       showToast(`Loaded ${state.rawCollection.length} items from AniList`);
     })
@@ -560,7 +541,7 @@
       cover: e.media.coverImage?.extraLarge || e.media.coverImage?.large || '',
       score: e.media.averageScore || e.score || 0,
       format: e.media.format || 'ANIME',
-      status: e.status || 'COMPLETED',
+      status: e.status || e.listStatus || 'COMPLETED',
       progress: e.progress || 0,
       type: e.media.type || state.mediaType,
       tier: existingTierMap.get(String(e.media.id)) || null
@@ -689,6 +670,35 @@
     if (countLabel) {
       countLabel.textContent = `${state.media.length} items (${state.mediaType.toLowerCase()})`;
     }
+
+    // Calculate status breakdown for pills
+    const counts = {
+      ALL: 0,
+      COMPLETED: 0,
+      CURRENT: 0,
+      PLANNING: 0,
+      PAUSED: 0,
+      DROPPED: 0
+    };
+
+    state.rawCollection.forEach(item => {
+      if (item.type === state.mediaType) {
+        counts.ALL++;
+        if (counts[item.status] !== undefined) {
+          counts[item.status]++;
+        }
+      }
+    });
+
+    Object.keys(counts).forEach(st => {
+      const badgeEl = document.getElementById(`count-${st}`);
+      if (badgeEl) badgeEl.textContent = counts[st];
+    });
+
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+      const pStatus = pill.dataset.status;
+      pill.classList.toggle('active', pStatus === state.statusFilter);
+    });
   }
 
   function updateUserUI() {
