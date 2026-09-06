@@ -1,0 +1,8 @@
+{
+  "name": "AniTier - AniList Tier List",
+  "description": "Create and customize beautiful tier lists from your AniList anime and manga collection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

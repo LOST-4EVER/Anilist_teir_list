@@ -4,7 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "dev": "node server.js",
+    "build": "echo 'No build step needed'",
+    "start": "node server.js",
+    "lint": "echo 'No lint step needed'"
   },
   "keywords": [],
   "type": "commonjs",

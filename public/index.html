@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AniTier - Anilist Tier List</title>
+  <title>AniTier - AniList Tier List</title>
+  <meta name="description" content="Create and customize beautiful tier lists from your AniList anime and manga collection.">
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -24,51 +25,117 @@
     <symbol id="icon-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
     <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
     <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7 5.7 1.9-5.7 1.9L12 18l-1.9-5.5L4.4 10.6l5.7-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="icon-sort" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+    <symbol id="icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.72 1.7-1.65 0-.43-.17-.83-.44-1.12-.27-.29-.44-.69-.44-1.13 0-.92.77-1.65 1.7-1.65h1.98c2.8 0 5.02-2.22 5.02-5.02 0-5.25-4.25-9.43-9.52-9.43z"/></symbol>
+    <symbol id="icon-google" viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 15.907 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></symbol>
   </svg>
 
   <!-- Login Modal -->
   <div class="modal-overlay" id="loginModal">
-    <div class="modal">
+    <div class="modal modal-login">
       <button class="modal-close" id="closeLoginModal">
         <svg class="icon"><use href="#icon-close"/></svg>
       </button>
-      <h2 class="modal-title">Login to AniList</h2>
-      <p class="modal-subtitle">Connect your AniList account to import your anime list. No setup needed.</p>
 
-      <button class="btn-anilist" id="loginBtn">
-        <span class="anilist-dot"></span>
-        <span id="loginBtnLabel">Continue with AniList</span>
-      </button>
-
-      <div class="login-steps" id="loginSteps">
-        <p><strong>That's it — 3 simple steps:</strong></p>
-        <ol>
-          <li>Click the button above and log in / approve on AniList.</li>
-          <li>AniList will show you your <b>access token</b> with a copy button.</li>
-          <li>Come back, paste the token in the box below. Done!</li>
-        </ol>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="username">
+          <svg class="icon"><use href="#icon-user"/></svg>
+          Web Access
+        </button>
+        <button class="auth-tab" data-tab="google">
+          <svg class="icon"><use href="#icon-google"/></svg>
+          Google Sign-In
+        </button>
+        <button class="auth-tab" data-tab="token">
+          <svg class="icon"><use href="#icon-spark"/></svg>
+          AniList Token
+        </button>
       </div>
 
-      <div class="login-separator"><span>paste your token here</span></div>
-      <div class="token-input-row">
-        <input type="password" id="tokenInput" placeholder="Paste your AniList access token" autocomplete="off" spellcheck="false">
-        <button class="btn-primary" id="tokenConnectBtn">Connect</button>
-      </div>
-      <div class="hidden" id="manualAuthWrap">
-        <p class="modal-hint center">Popup blocked? Click here to authorize in a new tab:
-          <a href="#" id="manualAuthLink" target="_blank" rel="noopener" class="hint-link">Open AniList authorization</a>
-        </p>
-      </div>
-      <p class="modal-hint">The token is stored only in your browser and makes it work for a year.</p>
+      <!-- Tab 1: Username / Web Access Import -->
+      <div class="auth-tab-content active" id="tabUsername">
+        <h2 class="modal-title">Web AniList Access</h2>
+        <p class="modal-subtitle">Instant web access! Enter any AniList username or profile URL to load anime &amp; manga immediately.</p>
 
-      <details class="advanced-settings">
-        <summary>Advanced: use your own Client ID (optional)</summary>
-        <p class="advanced-text">Prefer using your own API client (same pin flow, your own limits). Get a free Client ID at <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener" class="hint-link">anilist.co/settings/developer</a>, set its <b>Redirect URL</b> to <code>https://anilist.co/api/v2/oauth/pin</code>, then:</p>
         <div class="token-input-row">
-          <input type="text" id="clientIdInput" placeholder="Your Client ID (optional)" autocomplete="off" spellcheck="false">
-          <button class="btn-secondary" id="clientIdSaveBtn">Save</button>
+          <input type="text" id="usernameInput" placeholder="AniList Username or URL (e.g. gigguk, LOST-4EVER)" autocomplete="off" spellcheck="false">
+          <button class="btn-primary" id="usernameImportBtn">
+            <svg class="icon"><use href="#icon-spark"/></svg>
+            Load List
+          </button>
         </div>
-      </details>
+        <p class="modal-hint">No password or token required for public AniList collections!</p>
+      </div>
+
+      <!-- Tab 2: Google Sign-In -->
+      <div class="auth-tab-content" id="tabGoogle">
+        <h2 class="modal-title">Sign in with Google</h2>
+        <p class="modal-subtitle">Save and sync your tier lists securely with your Google profile across all web sessions.</p>
+
+        <button class="btn-google-login" id="googleSignInBtn">
+          <svg class="icon"><use href="#icon-google"/></svg>
+          Continue with Google
+        </button>
+
+        <div class="google-custom-box" style="margin-top: 16px;">
+          <p class="modal-hint center">Or set your Google display profile name:</p>
+          <div class="token-input-row">
+            <input type="text" id="googleNameInput" placeholder="Your Name or Email" autocomplete="off" spellcheck="false">
+            <button class="btn-primary" id="googleConnectBtn">Save Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Token OAuth -->
+      <div class="auth-tab-content" id="tabToken">
+        <h2 class="modal-title">AniList Token Authorization</h2>
+        <p class="modal-subtitle">Connect via official AniList OAuth token for private lists and account sync.</p>
+
+        <button class="btn-anilist" id="loginBtn">
+          <span class="anilist-dot"></span>
+          <span id="loginBtnLabel">1. Open AniList Authorization</span>
+        </button>
+
+        <div class="login-steps" id="loginSteps">
+          <p><strong>3 simple steps:</strong></p>
+          <ol>
+            <li>Click the button above and approve on AniList.</li>
+            <li>Copy your access token code (or the full token URL).</li>
+            <li>Paste it into the input box below and click Connect.</li>
+          </ol>
+        </div>
+
+        <div class="token-input-row">
+          <input type="password" id="tokenInput" placeholder="Paste your access token or token URL" autocomplete="off" spellcheck="false">
+          <button class="btn-primary" id="tokenConnectBtn">Connect</button>
+        </div>
+        <div class="hidden" id="manualAuthWrap">
+          <p class="modal-hint center">Popup blocked? Click here:
+            <a href="#" id="manualAuthLink" target="_blank" rel="noopener" class="hint-link">Open AniList authorization in new tab</a>
+          </p>
+        </div>
+
+        <div class="auth-fallback-box" style="margin-top: 14px; padding: 12px; background: var(--bg-tertiary); border-radius: 10px; text-align: center; font-size: 13px;">
+          <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Having token or authorization issues?</p>
+          <button class="btn-secondary btn-sm" id="switchToUsernameBtn" style="width: 100%;">
+            <svg class="icon"><use href="#icon-user"/></svg>
+            Switch to Web Access (Recommended &amp; Error-Free)
+          </button>
+        </div>
+
+        <details class="advanced-settings" style="margin-top: 12px;">
+          <summary>Advanced: Client ID Settings</summary>
+          <p class="advanced-text">To use a custom AniList API Client ID, set its redirect URL on AniList to <code>https://anilist.co/api/v2/oauth/pin</code>:</p>
+          <div class="token-input-row">
+            <input type="text" id="clientIdInput" placeholder="Client ID (default 4410)" autocomplete="off" spellcheck="false">
+            <button class="btn-secondary" id="clientIdSaveBtn">Save</button>
+          </div>
+        </details>
+      </div>
     </div>
   </div>
 
@@ -93,8 +160,12 @@
         </div>
       </div>
       <div class="settings-group">
-        <span class="settings-label">Data</span>
+        <span class="settings-label">Export & Backup</span>
         <div class="settings-actions">
+          <button class="btn-secondary" id="exportImageBtn">
+            <svg class="icon"><use href="#icon-image"/></svg>
+            Export as Image (PNG)
+          </button>
           <button class="btn-secondary" id="exportBtn">
             <svg class="icon"><use href="#icon-download"/></svg>
             Export JSON
@@ -107,7 +178,7 @@
       </div>
       <div class="settings-group">
         <span class="settings-label">About</span>
-        <p class="about-text">AniTier - Create beautiful tier lists from your AniList anime &amp; manga.</p>
+        <p class="about-text">AniTier - Create beautiful, shareable tier lists from your AniList anime &amp; manga collection.</p>
       </div>
     </div>
   </div>
@@ -126,7 +197,7 @@
     <div class="header-center">
       <div class="search-box">
         <svg class="icon search-icon"><use href="#icon-search"/></svg>
-        <input type="text" id="searchInput" placeholder="Search anime, manga, characters...">
+        <input type="text" id="searchInput" placeholder="Search and quick-add anime or manga...">
         <div class="search-results" id="searchResults"></div>
       </div>
     </div>
@@ -138,14 +209,17 @@
       <div class="user-area">
         <div class="user-logged-out" id="userLoggedOut">
           <button class="btn-login" id="openLoginModal">
-            <svg class="icon"><use href="#icon-spark"/></svg>
-            Login
+            <svg class="icon"><use href="#icon-user"/></svg>
+            Load List / Login
           </button>
         </div>
         <div class="user-logged-in hidden" id="userLoggedIn">
           <div class="avatar" id="avatar"></div>
           <span class="username" id="username"></span>
-          <button class="btn-icon" id="logoutBtn" title="Logout">
+          <button class="btn-icon" id="syncBtn" title="Refresh/Sync from AniList">
+            <svg class="icon"><use href="#icon-refresh"/></svg>
+          </button>
+          <button class="btn-icon" id="logoutBtn" title="Change Account / Clear">
             <svg class="icon"><use href="#icon-logout"/></svg>
           </button>
         </div>
@@ -156,17 +230,58 @@
     </div>
   </header>
 
+  <!-- Collection Control Bar -->
+  <div class="collection-bar hidden" id="collectionBar">
+    <div class="collection-info">
+      <span class="collection-user" id="collectionUser">Collection:</span>
+      <span class="collection-count" id="collectionCount">0 items</span>
+    </div>
+    <div class="collection-controls">
+      <div class="type-toggle">
+        <button class="type-btn active" id="typeAnimeBtn" data-type="ANIME">Anime</button>
+        <button class="type-btn" id="typeMangaBtn" data-type="MANGA">Manga</button>
+      </div>
+      <div class="status-filters" id="statusFilters">
+        <button class="filter-pill active" data-status="ALL">All</button>
+        <button class="filter-pill" data-status="COMPLETED">Completed</button>
+        <button class="filter-pill" data-status="CURRENT">Watching/Reading</button>
+        <button class="filter-pill" data-status="PLANNING">Planning</button>
+        <button class="filter-pill" data-status="PAUSED">Paused</button>
+        <button class="filter-pill" data-status="DROPPED">Dropped</button>
+      </div>
+      <button class="btn-secondary btn-sm" id="headerExportImageBtn" title="Export Tier List Image">
+        <svg class="icon"><use href="#icon-image"/></svg>
+        Export PNG
+      </button>
+      <button class="btn-danger btn-sm" id="clearEntireListBtn" title="Delete & Clear Complete Entire List">
+        <svg class="icon"><use href="#icon-trash"/></svg>
+        Delete Entire List
+      </button>
+    </div>
+  </div>
+
   <!-- Main -->
-  <main class="main">
+  <main class="main" id="mainContainer">
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">
         <svg class="icon"><use href="#icon-spark"/></svg>
       </div>
-      <h2>Build your tier list</h2>
-      <p>Search or login to load your AniList collection</p>
-      <button class="btn-primary" id="emptyLoginBtn">
-        <svg class="icon"><use href="#icon-spark"/></svg>
-        Login with AniList
+      <h2>Build your AniList Tier List</h2>
+      <p>Enter your AniList username below to load your collection instantly!</p>
+
+      <div class="hero-import-box">
+        <input type="text" id="heroUsernameInput" placeholder="AniList Username (e.g. LOST-4EVER)" autocomplete="off" spellcheck="false">
+        <button class="btn-primary" id="heroImportBtn">
+          <svg class="icon"><use href="#icon-spark"/></svg>
+          Load My List
+        </button>
+      </div>
+
+      <div class="hero-divider"><span>OR</span></div>
+
+      <button class="btn-secondary" id="emptyLoginBtn">
+        <svg class="icon"><use href="#icon-user"/></svg>
+        Log in with Token
       </button>
     </div>
 
@@ -175,17 +290,27 @@
     </div>
 
     <div class="unranked-section" id="unrankedSection">
-      <h3 class="section-title">
-        <svg class="icon"><use href="#icon-star"/></svg>
-        Unranked
-      </h3>
+      <div class="unranked-header">
+        <h3 class="section-title">
+          <svg class="icon"><use href="#icon-star"/></svg>
+          Unranked <span class="unranked-badge" id="unrankedCountBadge">0</span>
+        </h3>
+        <div class="unranked-actions">
+          <select id="unrankedSortSelect" class="sort-select">
+            <option value="default">Sort: Default</option>
+            <option value="score">Sort: Score (High to Low)</option>
+            <option value="title">Sort: Title (A-Z)</option>
+          </select>
+          <button class="btn-secondary btn-sm" id="clearUnrankedBtn">Clear Unranked</button>
+        </div>
+      </div>
       <div class="unranked-grid" id="unrankedGrid"></div>
     </div>
   </main>
 
   <!-- Floating toolbar -->
   <div class="floating-tools">
-    <button class="btn-fab" id="addTierBtn" title="Add tier">
+    <button class="btn-fab" id="addTierBtn" title="Add Tier">
       <svg class="icon"><use href="#icon-plus"/></svg>
     </button>
   </div>
@@ -210,6 +335,7 @@
     </div>
   </template>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
