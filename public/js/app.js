@@ -2,8 +2,9 @@
   'use strict';
 
   const ANILIST_API = 'https://graphql.anilist.co';
+  const AUTH_URL = 'https://anilist.co/api/v2/oauth/authorize';
+  const PIN_REDIRECT = 'https://anilist.co/api/v2/oauth/pin';
   const BASE = window.location.pathname.replace(/[^/]*$/, '');
-  const REDIRECT_URI = window.location.origin + BASE + 'callback.html';
   const getClientId = () => localStorage.getItem('anitier-clientid') ||
     new URLSearchParams(window.location.search).get('client_id') || '4410';
 
@@ -111,7 +112,6 @@
   /* ============ AUTH ============ */
   function setupAuth() {
     const showLoginModal = () => {
-      document.getElementById('redirectUrlDisplay').textContent = REDIRECT_URI;
       document.getElementById('loginModal').classList.add('show');
     };
     document.getElementById('openLoginModal').addEventListener('click', showLoginModal);
@@ -122,10 +122,6 @@
 
     const clientIdInput = document.getElementById('clientIdInput');
     clientIdInput.value = getClientId();
-    clientIdInput.addEventListener('input', () => {
-      const hasOwn = clientIdInput.value.trim() !== '';
-      document.getElementById('clientIdHint').classList.toggle('hidden', hasOwn);
-    });
     document.getElementById('clientIdSaveBtn').addEventListener('click', () => {
       const val = clientIdInput.value.trim();
       if (val) localStorage.setItem('anitier-clientid', val);
@@ -136,35 +132,46 @@
       m.addEventListener('click', (e) => { if (e.target === m) m.closest('.modal-overlay').classList.remove('show'); });
     });
 
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      const clientId = getClientId();
-      if (clientId === '4410') {
-        showToast('Set your own Client ID above (free) - or paste a manual token', true);
-        document.getElementById('clientIdInput').focus();
-        return;
-      }
-      const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(clientId)}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+    const manualAuthLink = document.getElementById('manualAuthLink');
+    const manualAuthWrap = document.getElementById('manualAuthWrap');
+    const loginBtn = document.getElementById('loginBtn');
+
+    const openAuth = () => {
+      const authUrl = `${AUTH_URL}?client_id=${encodeURIComponent(getClientId())}&response_type=token&redirect_uri=${encodeURIComponent(PIN_REDIRECT)}`;
       const width = 600, height = 700;
       const left = (screen.width - width) / 2;
       const top = (screen.height - height) / 2;
+      let popup = null;
       try {
-        const popup = window.open(authUrl, 'anilistAuth',
+        popup = window.open(authUrl, 'anilistAuth',
           `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
-        if (!popup) {
-          showToast('Popup blocked - allow popups to login', true);
-          return;
-        }
-        showToast('Waiting for authorization...');
-        pollPopupForToken(popup);
-      } catch (e) {
-        showToast('Could not open popup', true);
+      } catch (e) {}
+      if (popup) {
+        manualAuthWrap.classList.add('hidden');
+        showToast('Approve on AniList, then copy the token and paste it below');
+        focusTokenInput();
+      } else {
+        manualAuthLink.href = authUrl;
+        manualAuthWrap.classList.remove('hidden');
+        showToast('Popup was blocked - click the AniList link below instead', true);
       }
-    });
+    };
+
+    loginBtn.addEventListener('click', openAuth);
+    document.getElementById('tokenConnectBtn').addEventListener('click', () => connectToken(tokenInput.value));
 
     const tokenInput = document.getElementById('tokenInput');
-    document.getElementById('tokenConnectBtn').addEventListener('click', () => connectToken(tokenInput.value));
+    const focusTokenInput = () => { tokenInput.focus(); };
     tokenInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') connectToken(tokenInput.value);
+    });
+    tokenInput.addEventListener('paste', () => {
+      setTimeout(() => { if (tokenInput.value) connectToken(tokenInput.value); }, 60);
+    });
+    window.addEventListener('focus', () => {
+      if (document.getElementById('loginModal').classList.contains('show') && tokenInput.value) {
+        connectToken(tokenInput.value);
+      }
     });
 
     document.getElementById('settingsModal').addEventListener('click', (e) => {
@@ -209,40 +216,6 @@
         document.getElementById('loginModal').classList.add('show');
       }
     });
-  }
-
-  function pollPopupForToken(popup) {
-    let attempts = 0;
-    const timer = setInterval(() => {
-      attempts++;
-      if (attempts > 250) {
-        clearInterval(timer);
-        showToast('Authorization timed out. Paste your token manually instead.', true);
-        try { popup.close(); } catch (e) {}
-        return;
-      }
-      let hash = null;
-      try {
-        if (popup.location.href.includes('anilist.co')) return;
-        hash = popup.location.hash;
-        if (!hash) hash = popup.location.search;
-      } catch (e) {
-        return;
-      }
-      if (hash && hash.includes('access_token=')) {
-        clearInterval(timer);
-        const params = new URLSearchParams(hash.substring(1));
-        const token = params.get('access_token');
-        try { popup.close(); } catch (e) {}
-        if (token) finalizeLogin(token);
-        else showToast('Login failed. No token returned.', true);
-      } else if (hash && hash.includes('error=')) {
-        clearInterval(timer);
-        try { popup.close(); } catch (e) {}
-        const err = new URLSearchParams(hash.substring(1)).get('error');
-        showToast('Login error: check your Client ID and redirect URL', true);
-      }
-    }, 120);
   }
 
   function connectToken(rawToken) {

@@ -861,6 +861,37 @@ body::before {
   color: var(--text-primary);
 }
 
+.advanced-settings {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.advanced-settings summary {
+  cursor: pointer;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.advanced-settings .advanced-text {
+  margin: 8px 0 10px;
+  line-height: 1.55;
+}
+
+.advanced-settings code {
+  padding: 2px 5px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--color-primary);
+  word-break: break-all;
+}
+
+.modal-hint.center {
+  text-align: center;
+}
+
 .modal-settings {
   max-width: 480px;
 }

@@ -29,16 +29,16 @@ The site is deployed via a GitHub Actions workflow (see `.github/workflows/deplo
 
 ### AniList OAuth (Login)
 
-Login only works with **your own** AniList API client. The bundled demo client can't return a token to this site, so set up your own (free, 1 minute):
+**No setup needed.** Login uses AniList's built-in **Auth Pin flow** with the public demo client — you don't need to create your own API client:
 
-1. Go to https://anilist.co/settings/developer and click **Create New Client**.
-2. Set the client's **Redirect URL** to exactly:
-   `https://LOST-4EVER.github.io/Anilist_teir_list/callback.html`
-   (If you fork, use your own username/path.)
-3. Open the app, click **Login**, paste your **Client ID** in the login modal, and click **Save**.
-4. Click **Continue with AniList** — approve, and you'll be logged in automatically.
+1. Open the app and click **Login**.
+2. Click **Continue with AniList** and log in / approve on AniList.
+3. AniList shows your **access token** with a copy button — copy it.
+4. Return to the app and paste the token in the box (it connects automatically).
 
-No account or registration is needed to **search** anime, or to **manually paste a token** (obtain one at https://anilist.co/api/v2/oauth/authorize?client_id=4410&response_type=token).
+Your token is stored only in your browser and stays valid for a year.
+
+> Optional: Prefer your own API client (same pin flow, your own rate limits)? Create a free client at https://anilist.co/settings/developer, set its **Redirect URL** to exactly `https://anilist.co/api/v2/oauth/pin`, then enter your **Client ID** under the *Advanced* section of the login modal.
 
 ## Project Structure
 
@@ -52,4 +52,4 @@ server.js             # Optional local dev server (Express)
 .github/workflows/    # GitHub Pages deployment
 ```
 
-> Note: Login uses AniList's OAuth. If the shared demo client is rate-limited or the redirect isn't registered, create your own client as described above.
+> Note: Login uses AniList's OAuth **Auth Pin flow** (copy-paste the token shown by AniList) — this works with the public demo client and needs no account or registration.
