@@ -38,7 +38,12 @@
         <span class="anilist-dot"></span>
         Continue with AniList
       </button>
-      <p class="modal-hint">You'll be redirected to AniList to authorize access.</p>
+      <div class="login-separator"><span>or paste an access token</span></div>
+      <div class="token-input-row">
+        <input type="text" id="tokenInput" placeholder="Paste your AniList access token" autocomplete="off" spellcheck="false">
+        <button class="btn-primary" id="tokenConnectBtn">Connect</button>
+      </div>
+      <p class="modal-hint">Don't have a token? <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener" class="hint-link">Create an API client</a> or get a token via <a href="https://anilist.co/api/v2/oauth/authorize?client_id=4410&response_type=token" target="_blank" rel="noopener" class="hint-link">the token page</a>.</p>
     </div>
   </div>
 
@@ -164,9 +169,6 @@
     <div class="tier-row">
       <div class="tier-label"></div>
       <div class="tier-items"></div>
-      <button class="tier-delete" title="Delete tier">
-        <svg class="icon"><use href="#icon-x"/></svg>
-      </button>
     </div>
   </template>
 

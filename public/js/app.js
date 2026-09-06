@@ -47,8 +47,6 @@
     loadState();
     setupAuth();
     setupListeners();
-    renderTiers();
-    renderUnranked();
     checkURLForToken();
     updateUserUI();
 
@@ -78,8 +76,7 @@
         state.token = data.token || null;
         state.tiers = data.tiers && data.tiers.length ? data.tiers : defaultTiers();
         state.media = data.media || [];
-        renderTiers();
-        renderUnranked();
+        renderAll();
         if (!state.media.length) {
           document.getElementById('emptyState').classList.remove('hidden');
         }
@@ -123,18 +120,27 @@
     });
 
     document.getElementById('loginBtn').addEventListener('click', () => {
-      const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+      const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${CLIENT_ID}&response_type=token`;
       const width = 600, height = 700;
       const left = (screen.width - width) / 2;
       const top = (screen.height - height) / 2;
-      const popup = window.open(authUrl, 'anilistAuth',
-        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
-      if (!popup) {
-        showToast('Popup blocked - allow popups to login', true);
-        return;
+      try {
+        const popup = window.open(authUrl, 'anilistAuth',
+          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+        if (!popup) {
+          showToast('Popup blocked - allow popups to login', true);
+          return;
+        }
+        showToast('Complete authorization in the popup, then paste your token below');
+      } catch (e) {
+        showToast('Could not open popup', true);
       }
-      popup.focus();
-      pollPopupForToken(popup);
+    });
+
+    const tokenInput = document.getElementById('tokenInput');
+    document.getElementById('tokenConnectBtn').addEventListener('click', () => connectToken(tokenInput.value));
+    tokenInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') connectToken(tokenInput.value);
     });
 
     document.getElementById('settingsModal').addEventListener('click', (e) => {
@@ -181,39 +187,18 @@
     });
   }
 
-  function pollPopupForToken(popup) {
-    let attempts = 0;
-    const maxAttempts = 200;
-    const timer = setInterval(() => {
-      attempts++;
-      if (attempts >= maxAttempts) {
-        clearInterval(timer);
-        showToast('Login timed out', true);
-        return;
-      }
-      let hash = null;
-      try {
-        if (popup.location.href.includes('anilist.co')) return;
-        hash = popup.location.hash;
-      } catch (e) {
-        return;
-      }
-      if (hash && hash.includes('access_token=')) {
-        clearInterval(timer);
-        const params = new URLSearchParams(hash.substring(1));
-        const token = params.get('access_token');
-        if (token) {
-          popup.close();
-          finalizeLogin(token);
-        } else {
-          popup.close();
-          showToast('Login failed', true);
-        }
-      }
-    }, 100);
+  function connectToken(rawToken) {
+    const token = String(rawToken || '').trim();
+    if (!token) {
+      showToast('Please paste your AniList access token', true);
+      return;
+    }
+    finalizeLogin(token, () => {
+      document.getElementById('tokenInput').value = '';
+    });
   }
 
-  function finalizeLogin(token) {
+  function finalizeLogin(token, onSuccess) {
     if (state.loggingIn) return;
     state.loggingIn = true;
     state.token = token;
@@ -224,10 +209,11 @@
       updateUserUI();
       loadUserList();
       document.getElementById('loginModal').classList.remove('show');
+      if (onSuccess) onSuccess();
       showToast('Logged in as ' + (user?.name || 'user'));
     }).catch(err => {
       state.loggingIn = false;
-      showToast('Login failed', true);
+      showToast('Invalid token. Check it and try again.', true);
     });
   }
 
@@ -336,7 +322,7 @@
       }));
       state.media = media;
       persistState();
-      renderUnranked();
+      renderAll();
       document.getElementById('emptyState').classList.add('hidden');
       showToast(`Loaded ${media.length} anime from AniList`);
     }).catch(err => {
@@ -485,8 +471,20 @@
       const label = document.createElement('div');
       label.className = 'tier-label';
       label.style.background = tier.color;
-      label.textContent = tier.label;
       label.dataset.label = '';
+      const labelText = document.createElement('span');
+      labelText.className = 'tier-label-text';
+      labelText.textContent = tier.label;
+      label.appendChild(labelText);
+      const labelDelete = document.createElement('button');
+      labelDelete.className = 'label-delete';
+      labelDelete.title = 'Delete tier';
+      labelDelete.innerHTML = '<svg class="icon"><use href="#icon-x"/></svg>';
+      labelDelete.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeTier(tier.id, row);
+      });
+      label.appendChild(labelDelete);
 
       const items = document.createElement('div');
       items.className = 'tier-items';
@@ -501,54 +499,57 @@
       container.appendChild(row);
 
       attachLabelEdit(label, tier);
-      attachTierDelete(row, tier);
     });
 
     attachDragEvents();
   }
 
+  function removeTier(tierId, row) {
+    const idx = state.tiers.findIndex(t => t.id === tierId);
+    if (idx === -1) return;
+    state.tiers.splice(idx, 1);
+    state.media.forEach(m => { if (m.tier === tierId) m.tier = null; });
+    row.classList.add('deleted');
+    setTimeout(() => {
+      row.remove();
+      renderAll();
+      persistState();
+    }, 250);
+  }
+
   function attachLabelEdit(label, tier) {
-    label.addEventListener('click', () => {
+    label.addEventListener('click', (e) => {
+      if (e.target.closest('.label-delete')) return;
+      if (label.querySelector('input')) return;
       const input = document.createElement('input');
       input.type = 'text';
       input.value = tier.label;
       input.maxLength = 8;
-      label.innerHTML = '';
-      label.appendChild(input);
+      const textEl = label.querySelector('.tier-label-text');
+      if (textEl) textEl.remove();
+      label.insertBefore(input, label.querySelector('.label-delete'));
       input.focus();
       input.select();
 
       const commit = () => {
         tier.label = input.value.trim() || tier.label;
-        label.innerHTML = '';
-        label.style.background = tier.color;
-        label.textContent = tier.label;
+        const text = document.createElement('span');
+        text.className = 'tier-label-text';
+        text.textContent = tier.label;
+        input.replaceWith(text);
         persistState();
       };
 
       input.addEventListener('blur', commit);
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { input.blur(); }
-        if (e.key === 'Escape') { label.textContent = tier.label; input.remove(); }
+        if (e.key === 'Enter') input.blur();
+        if (e.key === 'Escape') {
+          const text = document.createElement('span');
+          text.className = 'tier-label-text';
+          text.textContent = tier.label;
+          input.replaceWith(text);
+        }
       });
-    });
-  }
-
-  function attachTierDelete(row, tier) {
-    row.addEventListener('click', (e) => {
-      const delBtn = e.target.closest('.tier-delete');
-      if (!delBtn) return;
-      const idx = state.tiers.indexOf(tier);
-      if (idx > -1) {
-        state.tiers.splice(idx, 1);
-        state.media.forEach(m => { if (m.tier === tier.id) m.tier = null; });
-        row.classList.add('deleted');
-        setTimeout(() => {
-          row.remove();
-          renderUnranked();
-          persistState();
-        }, 300);
-      }
     });
   }
 
@@ -560,6 +561,12 @@
       grid.appendChild(createItemElement(m));
     });
     attachDragEvents();
+    return unranked.length;
+  }
+
+  function renderAll() {
+    renderTiers();
+    renderUnranked();
   }
 
   function createItemElement(media) {
@@ -576,17 +583,24 @@
     item.dataset.mediaId = media.id;
     item.appendChild(img);
 
-    const tooltip = document.createElement('div');
-    tooltip.className = 'item-tooltip';
-    tooltip.innerHTML = `<img class="item-tooltip-cover" src="${media.cover}" alt=""><span class="item-tooltip-title">${esc(media.title)}</span>${media.score ? `<span class="item-tooltip-score">Score: ${media.score}</span>` : ''}`;
-    document.body.appendChild(tooltip);
+    let tooltip = null;
     item.addEventListener('mouseenter', () => {
+      if (tooltip) tooltip.remove();
+      tooltip = document.createElement('div');
+      tooltip.className = 'item-tooltip';
+      tooltip.innerHTML = `<img class="item-tooltip-cover" src="${media.cover}" alt=""><span class="item-tooltip-title">${esc(media.title)}</span>${media.score ? `<span class="item-tooltip-score">Score: ${media.score}</span>` : ''}`;
+      document.body.appendChild(tooltip);
       tooltip.style.display = 'flex';
       positionTooltip(tooltip, item);
     });
-    item.addEventListener('mousemove', () => positionTooltip(tooltip, item));
+    item.addEventListener('mousemove', () => {
+      if (tooltip && tooltip.parentNode) positionTooltip(tooltip, item);
+    });
     item.addEventListener('mouseleave', () => {
-      tooltip.style.display = 'none';
+      if (tooltip) { tooltip.remove(); tooltip = null; }
+    });
+    item.addEventListener('dragstart', () => {
+      if (tooltip) { tooltip.remove(); tooltip = null; }
     });
 
     const removeBtn = document.createElement('button');
@@ -617,6 +631,8 @@
   }
 
   /* ============ DRAG & DROP ============ */
+  let draggedEl = null;
+
   function attachDragEvents() {
     document.querySelectorAll('.tier-item').forEach(item => {
       item.addEventListener('dragstart', handleDragStart);
@@ -630,26 +646,18 @@
     });
   }
 
-  let dragPayload = null;
-
   function handleDragStart(e) {
-    dragPayload = {
-      src: e.target.closest('.tier-item').dataset.mediaId,
-      from: null
-    };
-    const parent = e.target.closest('.tier-items');
-    if (parent) {
-      const tierRow = parent.closest('.tier-row');
-      if (tierRow) dragPayload.from = tierRow.dataset.tierId;
-    }
-    e.target.classList.add('dragging');
+    const item = e.target.closest('.tier-item');
+    if (!item) return;
+    draggedEl = item;
+    item.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', dragPayload.src);
+    e.dataTransfer.setData('text/plain', item.dataset.mediaId);
   }
 
   function handleDragEnd(e) {
     e.target.classList.remove('dragging');
-    dragPayload = null;
+    draggedEl = null;
     document.querySelectorAll('.tier-row').forEach(r => r.classList.remove('dragover'));
   }
 
@@ -680,26 +688,22 @@
     const media = state.media.find(m => String(m.id) === mediaId);
     if (!media) return;
 
-    const oldTier = media.tier;
-    media.tier = tierId;
+    const srcItem = draggedEl;
+    const isUnrankedTarget = container.classList.contains('unranked-grid');
 
-    if (container.classList.contains('unranked-grid')) {
-      container.insertBefore(e.target.closest('.tier-item') || getItemForMedia(mediaId), container.firstChild);
-      persistState();
-      renderUnranked();
-      return;
+    media.tier = tierId || null;
+
+    if (isUnrankedTarget && srcItem) {
+      const grid = document.getElementById('unrankedGrid');
+      grid.insertBefore(srcItem, grid.firstChild);
+    }
+    if (srcItem && srcItem.parentElement === container) {
+      container.appendChild(srcItem);
     }
 
+    renderAll();
     persistState();
-    renderTiers();
-    renderUnranked();
     showToast(tierId ? `Moved to tier ${getTierLabel(tierId)}` : 'Moved to unranked');
-  }
-
-  function getItemForMedia(mediaId) {
-    const media = state.media.find(m => String(m.id) === mediaId);
-    if (!media) return null;
-    return createItemElement(media);
   }
 
   function getTierLabel(tierId) {
@@ -716,7 +720,6 @@
     state.media.push({ ...media, tier: null });
     persistState();
     renderUnranked();
-    attachDragEvents();
     showToast('Added to unranked');
   }
 
@@ -725,8 +728,7 @@
     if (idx > -1) {
       state.media.splice(idx, 1);
       persistState();
-      renderTiers();
-      renderUnranked();
+      renderAll();
       showToast('Removed');
     }
   }
@@ -752,8 +754,7 @@
     state.tiers = defaultTiers();
     state.media = [];
     persistState();
-    renderTiers();
-    renderUnranked();
+    renderAll();
     document.getElementById('emptyState').classList.remove('hidden');
     showToast('Tier list reset');
   }
