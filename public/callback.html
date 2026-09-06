@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AniTier - Auth</title>
+</head>
+<body>
+  <script>
+    (function() {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get('access_token');
+
+      if (token) {
+        const CLIENT_ID = '4410';
+        const ANILIST_API = 'https://graphql.anilist.co';
+
+        fetch(ANILIST_API, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            query: `query { Viewer { id name avatar { large } } }`
+          })
+        })
+        .then(r => r.json())
+        .then(data => {
+          setTimeout(() => {
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'anitier-auth',
+                token: token,
+                user: data.data?.Viewer || null
+              }, window.location.origin);
+            }
+            document.body.innerHTML = '<h2>Login successful! You can close this window.</h2>';
+          }, 500);
+        })
+        .catch(() => {
+          setTimeout(() => {
+            if (window.opener) {
+              window.opener.postMessage({ type: 'anitier-auth', token: null }, window.location.origin);
+            }
+            document.body.innerHTML = '<h2 style="color:red">Login failed. Please close this window and try again.</h2>';
+          }, 500);
+        });
+      } else {
+        document.body.innerHTML = '<h2 style="color:red">Authorization failed.</h2>';
+      }
+    })();
+  </script>
+</body>
+</html>

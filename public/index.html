@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniTier - Anilist Tier List</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="icon-grip" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="18" r="1.5"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7 5.7 1.9-5.7 1.9L12 18l-1.9-5.5L4.4 10.6l5.7-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  </svg>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="modal-close" id="closeLoginModal">
+        <svg class="icon"><use href="#icon-close"/></svg>
+      </button>
+      <h2 class="modal-title">Login to AniList</h2>
+      <p class="modal-subtitle">Connect your AniList account to import your anime list</p>
+      <button class="btn-anilist" id="loginBtn">
+        <span class="anilist-dot"></span>
+        Continue with AniList
+      </button>
+      <p class="modal-hint">You'll be redirected to AniList to authorize access.</p>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal modal-settings">
+      <button class="modal-close" id="closeSettingsModal">
+        <svg class="icon"><use href="#icon-close"/></svg>
+      </button>
+      <h2 class="modal-title">Settings</h2>
+      <div class="settings-group">
+        <span class="settings-label">Theme</span>
+        <div class="theme-toggle" id="themeToggle">
+          <button class="theme-btn active" data-theme="dark">
+            <svg class="icon"><use href="#icon-moon"/></svg>
+            Dark
+          </button>
+          <button class="theme-btn" data-theme="light">
+            <svg class="icon"><use href="#icon-sun"/></svg>
+            Light
+          </button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <span class="settings-label">Data</span>
+        <div class="settings-actions">
+          <button class="btn-secondary" id="exportBtn">
+            <svg class="icon"><use href="#icon-download"/></svg>
+            Export JSON
+          </button>
+          <button class="btn-secondary" id="resetBtn">
+            <svg class="icon"><use href="#icon-trash"/></svg>
+            Reset Tier List
+          </button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <span class="settings-label">About</span>
+        <p class="about-text">AniTier - Create beautiful tier lists from your AniList anime &amp; manga.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg class="icon logo-icon"><use href="#icon-spark"/></svg>
+        <span class="logo-text">Ani<span class="logo-accent">Tier</span></span>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <svg class="icon search-icon"><use href="#icon-search"/></svg>
+        <input type="text" id="searchInput" placeholder="Search anime, manga, characters...">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-secondary" id="addAnimeBtn" title="Quick add anime">
+        <svg class="icon"><use href="#icon-plus"/></svg>
+        Quick Add
+      </button>
+      <div class="user-area">
+        <div class="user-logged-out" id="userLoggedOut">
+          <button class="btn-login" id="openLoginModal">
+            <svg class="icon"><use href="#icon-spark"/></svg>
+            Login
+          </button>
+        </div>
+        <div class="user-logged-in hidden" id="userLoggedIn">
+          <div class="avatar" id="avatar"></div>
+          <span class="username" id="username"></span>
+          <button class="btn-icon" id="logoutBtn" title="Logout">
+            <svg class="icon"><use href="#icon-logout"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-icon" id="openSettingsModal" title="Settings">
+        <svg class="icon"><use href="#icon-settings"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg class="icon"><use href="#icon-spark"/></svg>
+      </div>
+      <h2>Build your tier list</h2>
+      <p>Search or login to load your AniList collection</p>
+      <button class="btn-primary" id="emptyLoginBtn">
+        <svg class="icon"><use href="#icon-spark"/></svg>
+        Login with AniList
+      </button>
+    </div>
+
+    <div class="tier-list-container" id="tierContainer">
+      <!-- Tier rows will be dynamically generated -->
+    </div>
+
+    <div class="unranked-section" id="unrankedSection">
+      <h3 class="section-title">
+        <svg class="icon"><use href="#icon-star"/></svg>
+        Unranked
+      </h3>
+      <div class="unranked-grid" id="unrankedGrid"></div>
+    </div>
+  </main>
+
+  <!-- Floating toolbar -->
+  <div class="floating-tools">
+    <button class="btn-fab" id="addTierBtn" title="Add tier">
+      <svg class="icon"><use href="#icon-plus"/></svg>
+    </button>
+  </div>
+
+  <template id="tierRowTemplate">
+    <div class="tier-row">
+      <div class="tier-label"></div>
+      <div class="tier-items"></div>
+      <button class="tier-delete" title="Delete tier">
+        <svg class="icon"><use href="#icon-x"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <template id="itemTemplate">
+    <div class="tier-item">
+      <img class="item-cover" loading="lazy">
+      <div class="item-tooltip">
+        <span class="item-tooltip-title"></span>
+        <span class="item-tooltip-score"></span>
+      </div>
+      <button class="item-remove">
+        <svg class="icon"><use href="#icon-x"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
