@@ -2,9 +2,10 @@
   'use strict';
 
   const ANILIST_API = 'https://graphql.anilist.co';
-  const CLIENT_ID = new URLSearchParams(window.location.search).get('client_id') || '4410';
   const BASE = window.location.pathname.replace(/[^/]*$/, '');
   const REDIRECT_URI = window.location.origin + BASE + 'callback.html';
+  const getClientId = () => localStorage.getItem('anitier-clientid') ||
+    new URLSearchParams(window.location.search).get('client_id') || '4410';
 
   const TIER_COLORS = [
     '#FF4D4D', '#FF8C42', '#FFD700', '#7BC950',
@@ -109,18 +110,40 @@
 
   /* ============ AUTH ============ */
   function setupAuth() {
-    document.getElementById('openLoginModal').addEventListener('click', () => {
+    const showLoginModal = () => {
+      document.getElementById('redirectUrlDisplay').textContent = REDIRECT_URI;
       document.getElementById('loginModal').classList.add('show');
-    });
+    };
+    document.getElementById('openLoginModal').addEventListener('click', showLoginModal);
     document.getElementById('closeLoginModal').addEventListener('click', () => {
       document.getElementById('loginModal').classList.remove('show');
     });
-    document.getElementById('emptyLoginBtn').addEventListener('click', () => {
-      document.getElementById('loginModal').classList.add('show');
+    document.getElementById('emptyLoginBtn').addEventListener('click', showLoginModal);
+
+    const clientIdInput = document.getElementById('clientIdInput');
+    clientIdInput.value = getClientId();
+    clientIdInput.addEventListener('input', () => {
+      const hasOwn = clientIdInput.value.trim() !== '';
+      document.getElementById('clientIdHint').classList.toggle('hidden', hasOwn);
+    });
+    document.getElementById('clientIdSaveBtn').addEventListener('click', () => {
+      const val = clientIdInput.value.trim();
+      if (val) localStorage.setItem('anitier-clientid', val);
+      else localStorage.removeItem('anitier-clientid');
+      showToast('Client ID saved');
+    });
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', (e) => { if (e.target === m) m.closest('.modal-overlay').classList.remove('show'); });
     });
 
     document.getElementById('loginBtn').addEventListener('click', () => {
-      const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${CLIENT_ID}&response_type=token`;
+      const clientId = getClientId();
+      if (clientId === '4410') {
+        showToast('Set your own Client ID above (free) - or paste a manual token', true);
+        document.getElementById('clientIdInput').focus();
+        return;
+      }
+      const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(clientId)}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
       const width = 600, height = 700;
       const left = (screen.width - width) / 2;
       const top = (screen.height - height) / 2;
@@ -131,7 +154,8 @@
           showToast('Popup blocked - allow popups to login', true);
           return;
         }
-        showToast('Complete authorization in the popup, then paste your token below');
+        showToast('Waiting for authorization...');
+        pollPopupForToken(popup);
       } catch (e) {
         showToast('Could not open popup', true);
       }
@@ -185,6 +209,40 @@
         document.getElementById('loginModal').classList.add('show');
       }
     });
+  }
+
+  function pollPopupForToken(popup) {
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts++;
+      if (attempts > 250) {
+        clearInterval(timer);
+        showToast('Authorization timed out. Paste your token manually instead.', true);
+        try { popup.close(); } catch (e) {}
+        return;
+      }
+      let hash = null;
+      try {
+        if (popup.location.href.includes('anilist.co')) return;
+        hash = popup.location.hash;
+        if (!hash) hash = popup.location.search;
+      } catch (e) {
+        return;
+      }
+      if (hash && hash.includes('access_token=')) {
+        clearInterval(timer);
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        try { popup.close(); } catch (e) {}
+        if (token) finalizeLogin(token);
+        else showToast('Login failed. No token returned.', true);
+      } else if (hash && hash.includes('error=')) {
+        clearInterval(timer);
+        try { popup.close(); } catch (e) {}
+        const err = new URLSearchParams(hash.substring(1)).get('error');
+        showToast('Login error: check your Client ID and redirect URL', true);
+      }
+    }, 120);
   }
 
   function connectToken(rawToken) {

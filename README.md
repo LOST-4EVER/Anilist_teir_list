@@ -29,13 +29,16 @@ The site is deployed via a GitHub Actions workflow (see `.github/workflows/deplo
 
 ### AniList OAuth (Login)
 
-If you want login to work with your own app, you must create your own AniList API client:
+Login only works with **your own** AniList API client. The bundled demo client can't return a token to this site, so set up your own (free, 1 minute):
 
-1. Go to https://anilist.co/settings/developer and create a new client.
-2. Set the **Redirect URL** to your deployed site:
+1. Go to https://anilist.co/settings/developer and click **Create New Client**.
+2. Set the client's **Redirect URL** to exactly:
    `https://LOST-4EVER.github.io/Anilist_teir_list/callback.html`
    (If you fork, use your own username/path.)
-3. Put your client ID in `public/js/app.js` (`CLIENT_ID`), or override it via a `?client_id=YOUR_ID` query param on the page.
+3. Open the app, click **Login**, paste your **Client ID** in the login modal, and click **Save**.
+4. Click **Continue with AniList** — approve, and you'll be logged in automatically.
+
+No account or registration is needed to **search** anime, or to **manually paste a token** (obtain one at https://anilist.co/api/v2/oauth/authorize?client_id=4410&response_type=token).
 
 ## Project Structure
 

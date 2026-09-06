@@ -33,7 +33,17 @@
         <svg class="icon"><use href="#icon-close"/></svg>
       </button>
       <h2 class="modal-title">Login to AniList</h2>
-      <p class="modal-subtitle">Connect your AniList account to import your anime list</p>
+      <p class="modal-subtitle">Connect your AniList account to import your anime list.</p>
+
+      <div class="settings-group compact">
+        <span class="settings-label">Your API Client ID</span>
+        <div class="token-input-row">
+          <input type="text" id="clientIdInput" placeholder="e.g. 12345" autocomplete="off" spellcheck="false">
+          <button class="btn-secondary" id="clientIdSaveBtn">Save</button>
+        </div>
+        <p class="modal-hint left" id="clientIdHint">Leave empty to use the public demo client (manual token only). Get your own free Client ID at <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener" class="hint-link">anilist.co/settings/developer</a>.</p>
+      </div>
+
       <button class="btn-anilist" id="loginBtn">
         <span class="anilist-dot"></span>
         Continue with AniList
@@ -43,7 +53,16 @@
         <input type="text" id="tokenInput" placeholder="Paste your AniList access token" autocomplete="off" spellcheck="false">
         <button class="btn-primary" id="tokenConnectBtn">Connect</button>
       </div>
-      <p class="modal-hint">Don't have a token? <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener" class="hint-link">Create an API client</a> or get a token via <a href="https://anilist.co/api/v2/oauth/authorize?client_id=4410&response_type=token" target="_blank" rel="noopener" class="hint-link">the token page</a>.</p>
+      <div class="login-steps" id="loginSteps">
+        <p><strong>To get automatic login working:</strong></p>
+        <ol>
+          <li>Create a free app at <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener" class="hint-link">anilist.co/settings/developer</a>.</li>
+          <li>Set its Redirect URL to exactly:<br><code id="redirectUrlDisplay"></code></li>
+          <li>Enter your Client ID above, save, then click Continue with AniList.</li>
+        </ol>
+        <p>You'll then be redirected to Your list automatically.</p>
+      </div>
+      <p class="modal-hint" id="demoHint">Using the demo client? Authorize <a href="https://anilist.co/api/v2/oauth/authorize?client_id=4410&response_type=token" target="_blank" rel="noopener" class="hint-link">here</a>, copy the token from the result page, and paste it above.</p>
     </div>
   </div>
 
