@@ -46,6 +46,10 @@
           <svg class="icon"><use href="#icon-user"/></svg>
           Web Access
         </button>
+        <button class="auth-tab" data-tab="google">
+          <svg class="icon"><use href="#icon-google"/></svg>
+          Google Sign-In
+        </button>
         <button class="auth-tab" data-tab="token">
           <svg class="icon"><use href="#icon-spark"/></svg>
           AniList Token
@@ -64,30 +68,49 @@
             Load List
           </button>
         </div>
-        <p class="modal-hint">No password required for public AniList profiles!</p>
+        <p class="modal-hint">No password or token required for public AniList profiles!</p>
       </div>
 
-      <!-- Tab 2: Token OAuth -->
+      <!-- Tab 2: Google Sign-In -->
+      <div class="auth-tab-content" id="tabGoogle">
+        <h2 class="modal-title">Sign in with Google</h2>
+        <p class="modal-subtitle">Save and sync your custom tier lists securely with your Google profile across sessions.</p>
+
+        <button class="btn-google-login" id="googleSignInBtn">
+          <svg class="icon"><use href="#icon-google"/></svg>
+          Continue with Google
+        </button>
+
+        <div class="google-custom-box" style="margin-top: 16px;">
+          <p class="modal-hint center">Or customize your Google display name:</p>
+          <div class="token-input-row">
+            <input type="text" id="googleNameInput" placeholder="Your Name or Profile Handle" autocomplete="off" spellcheck="false">
+            <button class="btn-primary" id="googleConnectBtn">Save Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Token OAuth -->
       <div class="auth-tab-content" id="tabToken">
         <h2 class="modal-title">AniList Token Authorization</h2>
         <p class="modal-subtitle">Connect via official AniList OAuth token for private lists and account sync.</p>
 
         <button class="btn-anilist" id="loginBtn">
           <span class="anilist-dot"></span>
-          <span id="loginBtnLabel">1. Open AniList Authorization</span>
+          <span id="loginBtnLabel">1. Open AniList Authorization Page</span>
         </button>
 
         <div class="login-steps" id="loginSteps">
-          <p><strong>3 simple steps:</strong></p>
+          <p><strong>Quick 3-Step Guide:</strong></p>
           <ol>
-            <li>Click the button above and approve on AniList.</li>
-            <li>Copy your access token code (or the full token URL).</li>
-            <li>Paste it into the input box below and click Connect.</li>
+            <li>Click the button above to authorize on AniList.</li>
+            <li>Copy your access token or the redirect page URL.</li>
+            <li>Paste it below and click <strong>Connect</strong>.</li>
           </ol>
         </div>
 
         <div class="token-input-row">
-          <input type="password" id="tokenInput" placeholder="Paste your access token or token URL" autocomplete="off" spellcheck="false">
+          <input type="password" id="tokenInput" placeholder="Paste access token or PIN URL here" autocomplete="off" spellcheck="false">
           <button class="btn-primary" id="tokenConnectBtn">Connect</button>
         </div>
         <div class="hidden" id="manualAuthWrap">

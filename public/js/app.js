@@ -145,8 +145,9 @@
       tab.addEventListener('click', () => {
         const target = tab.dataset.tab;
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
-        document.getElementById('tabUsername').classList.toggle('active', target === 'username');
-        document.getElementById('tabToken').classList.toggle('active', target === 'token');
+        document.getElementById('tabUsername')?.classList.toggle('active', target === 'username');
+        document.getElementById('tabGoogle')?.classList.toggle('active', target === 'google');
+        document.getElementById('tabToken')?.classList.toggle('active', target === 'token');
       });
     });
 
@@ -154,11 +155,35 @@
     if (switchToUsernameBtn) {
       switchToUsernameBtn.addEventListener('click', () => {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'username'));
-        document.getElementById('tabUsername').classList.add('active');
-        document.getElementById('tabToken').classList.remove('active');
+        document.getElementById('tabUsername')?.classList.add('active');
+        document.getElementById('tabGoogle')?.classList.remove('active');
+        document.getElementById('tabToken')?.classList.remove('active');
         document.getElementById('usernameInput')?.focus();
       });
     }
+
+    // Google Sign-In Handler
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const googleConnectBtn = document.getElementById('googleConnectBtn');
+    const googleNameInput = document.getElementById('googleNameInput');
+
+    const doGoogleSignIn = (profileName) => {
+      const name = (profileName || googleNameInput?.value || 'Google User').trim();
+      state.user = {
+        id: 'google-' + Date.now(),
+        name: name,
+        avatar: { large: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80' },
+        isGoogle: true
+      };
+      state.username = name;
+      persistState();
+      updateUserUI();
+      hideLoginModal();
+      showToast(`Signed in as ${name}`);
+    };
+
+    if (googleSignInBtn) googleSignInBtn.addEventListener('click', () => doGoogleSignIn());
+    if (googleConnectBtn) googleConnectBtn.addEventListener('click', () => doGoogleSignIn());
 
     // Username / Web Access Import Handler (Modal)
     const usernameInput = document.getElementById('usernameInput');
@@ -204,13 +229,15 @@
 
     // Token OAuth Setup
     const clientIdInput = document.getElementById('clientIdInput');
-    clientIdInput.value = getClientId();
-    document.getElementById('clientIdSaveBtn').addEventListener('click', () => {
-      const val = clientIdInput.value.trim();
-      if (val) localStorage.setItem('anitier-clientid', val);
-      else localStorage.removeItem('anitier-clientid');
-      showToast('Client ID saved');
-    });
+    if (clientIdInput) {
+      clientIdInput.value = getClientId();
+      document.getElementById('clientIdSaveBtn')?.addEventListener('click', () => {
+        const val = clientIdInput.value.trim();
+        if (val) localStorage.setItem('anitier-clientid', val);
+        else localStorage.removeItem('anitier-clientid');
+        showToast('Client ID saved');
+      });
+    }
 
     document.querySelectorAll('.modal-overlay').forEach(m => {
       m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
@@ -222,8 +249,9 @@
 
     const openAuth = () => {
       const clientId = getClientId();
-      // Clean AniList Implicit OAuth authorize URL
-      const authUrl = `${AUTH_URL}?client_id=${encodeURIComponent(clientId)}&response_type=token`;
+      // Ensure redirect_uri=https://anilist.co/api/v2/oauth/pin is passed so AniList displays the PIN token page without redirecting to localhost!
+      const redirectUri = encodeURIComponent(PIN_REDIRECT);
+      const authUrl = `${AUTH_URL}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${redirectUri}&response_type=token`;
       const width = 600, height = 700;
       const left = (screen.width - width) / 2;
       const top = (screen.height - height) / 2;
