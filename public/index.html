@@ -1,351 +1,355 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AniTier - AniList Tier List</title>
-  <meta name="description" content="Create and customize beautiful tier lists from your AniList anime and manga collection.">
+  <title>AniTier - AniList Tier List Maker</title>
+  <meta name="description" content="Build and customize beautiful anime & manga tier lists directly from your AniList library.">
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
-    <symbol id="icon-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
-    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
-    <symbol id="icon-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
-    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
-    <symbol id="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
-    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
-    <symbol id="icon-grip" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="18" r="1.5"/></symbol>
-    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
-    <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-    <symbol id="icon-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
-    <symbol id="icon-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
-    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
-    <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7 5.7 1.9-5.7 1.9L12 18l-1.9-5.5L4.4 10.6l5.7-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
-    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
-    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
-    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
-    <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
-    <symbol id="icon-sort" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
-    <symbol id="icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.72 1.7-1.65 0-.43-.17-.83-.44-1.12-.27-.29-.44-.69-.44-1.13 0-.92.77-1.65 1.7-1.65h1.98c2.8 0 5.02-2.22 5.02-5.02 0-5.25-4.25-9.43-9.52-9.43z"/></symbol>
-    <symbol id="icon-google" viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 15.907 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></symbol>
-  </svg>
 
-  <!-- Login Modal -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal modal-login">
-      <button class="modal-close" id="closeLoginModal">
-        <svg class="icon"><use href="#icon-close"/></svg>
+  <!-- Top App Bar (Material 3 Surface) -->
+  <header class="m3-app-bar">
+    <div class="m3-app-bar-start">
+      <div class="m3-brand-logo">
+        <div class="m3-logo-badge">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="m3-brand-title">Ani<span class="text-primary">Tier</span></div>
+      </div>
+
+      <!-- Quick Media Segment Switcher (Anime / Manga) -->
+      <div class="m3-segmented-button">
+        <button class="m3-segment-btn active" id="typeAnimeBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="7" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+          <span>Anime</span>
+        </button>
+        <button class="m3-segment-btn" id="typeMangaBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Manga</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Search Bar (M3 Pill) -->
+    <div class="m3-app-bar-center">
+      <div class="m3-search-bar-wrap">
+        <svg class="icon search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="headerSearchInput" class="m3-search-input" placeholder="Search &amp; add any anime / manga..." autocomplete="off" spellcheck="false">
+        <div class="m3-search-dropdown" id="headerSearchResults"></div>
+      </div>
+    </div>
+
+    <!-- Right Controls: User Badge / Load & Settings -->
+    <div class="m3-app-bar-end">
+      <div class="user-session-box">
+        <div class="user-logged-out" id="userLoggedOut">
+          <button class="m3-btn-filled-tonal" id="openLoginModal">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Load AniList</span>
+          </button>
+        </div>
+        <div class="user-logged-in hidden" id="userLoggedIn">
+          <div class="m3-user-chip" id="userProfileChip" title="Click to reload or switch account">
+            <div class="m3-avatar" id="avatar"></div>
+            <span class="m3-username" id="username"></span>
+          </div>
+          <button class="m3-icon-btn" id="syncBtn" title="Sync from AniList">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+          <button class="m3-icon-btn" id="logoutBtn" title="Clear / Log out">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="m3-btn-filled action-export-btn" id="headerExportImageBtn" title="Export Tier List as Image (PNG)">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>Export PNG</span>
       </button>
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="username">
-          <svg class="icon"><use href="#icon-user"/></svg>
-          Web Access
+      <button class="m3-icon-btn" id="headerThemeToggleBtn" title="Toggle Theme">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="m3-icon-btn" id="openSettingsModal" title="Settings &amp; Backup">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- M3 Filter & Quick Actions Bar -->
+  <div class="m3-filter-surface">
+    <div class="m3-filter-inner">
+      <div class="m3-filter-chips" id="statusFilterBar">
+        <button class="m3-filter-chip active" data-status="ALL">All <span class="chip-count" id="count-ALL">0</span></button>
+        <button class="m3-filter-chip" data-status="COMPLETED">Completed <span class="chip-count" id="count-COMPLETED">0</span></button>
+        <button class="m3-filter-chip" data-status="CURRENT">Watching/Reading <span class="chip-count" id="count-CURRENT">0</span></button>
+        <button class="m3-filter-chip" data-status="PLANNING">Planning <span class="chip-count" id="count-PLANNING">0</span></button>
+        <button class="m3-filter-chip" data-status="PAUSED">Paused <span class="chip-count" id="count-PAUSED">0</span></button>
+        <button class="m3-filter-chip" data-status="DROPPED">Dropped <span class="chip-count" id="count-DROPPED">0</span></button>
+      </div>
+
+      <div class="m3-action-toolbar">
+        <button class="m3-btn-elevated" id="autoRankBtn" title="Auto-place entries into tiers based on AniList scores">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8L19 13"/><path d="M17.8 6.2L19 5"/><path d="M3 21l9-9"/><path d="M12.2 6.2L11 5"/></svg>
+          <span>Auto-Rank</span>
         </button>
-        <button class="auth-tab" data-tab="google">
-          <svg class="icon"><use href="#icon-google"/></svg>
-          Google Sign-In
+        <button class="m3-btn-elevated" id="addTierBtn" title="Add a new custom tier row">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Add Tier</span>
         </button>
-        <button class="auth-tab" data-tab="token">
-          <svg class="icon"><use href="#icon-spark"/></svg>
-          AniList Token
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Tier List Area -->
+  <main class="m3-main-container">
+    
+    <!-- Hero / Empty Prompt (Shown when no list loaded yet) -->
+    <div class="m3-quick-loader-card" id="quickLoaderCard">
+      <div class="loader-content-wrap">
+        <div class="loader-icon-circle">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.361 2.843h4.423l5.068 18.314H11.43L10.3 16.7H5.215l-1.077 4.457H0L6.361 2.843zm3.176 10.222L7.75 6.643h-.114l-1.787 6.422h3.688zM24 17.571a3.57 3.57 0 1 1-7.143 0 3.57 3.57 0 0 1 7.143 0z"/></svg>
+        </div>
+        <div class="loader-text-group">
+          <h2 class="loader-heading">Fetch your AniList collection to rank</h2>
+          <p class="loader-sub">Enter any AniList username or profile link below to load all anime or manga in seconds.</p>
+        </div>
+      </div>
+
+      <div class="loader-input-row">
+        <div class="m3-input-box">
+          <svg class="icon input-leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="heroUsernameInput" class="m3-text-field" placeholder="Enter AniList Username (e.g. lost4ever, gigguk)" autocomplete="off">
+        </div>
+        <button class="m3-btn-filled" id="heroImportBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Load My List</span>
         </button>
       </div>
 
-      <!-- Tab 1: Username / Web Access Import -->
-      <div class="auth-tab-content active" id="tabUsername">
-        <h2 class="modal-title">Web AniList Access</h2>
-        <p class="modal-subtitle">Instant web access! Enter any AniList username or profile link to load all lists (Completed, Watching, Dropped, Planning, Paused).</p>
+      <div class="m3-preset-bar">
+        <span class="preset-label">Instant Presets:</span>
+        <button type="button" class="m3-filter-chip" id="presetTopAnimeBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Top Rated Anime
+        </button>
+        <button type="button" class="m3-filter-chip" id="presetTrendingBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Trending Now
+        </button>
+        <button type="button" class="m3-filter-chip" id="presetDemoUserBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Sample User (lost4ever)
+        </button>
+      </div>
+    </div>
 
-        <div class="token-input-row">
-          <input type="text" id="usernameInput" placeholder="AniList Username or URL (e.g. gigguk, LOST-4EVER)" autocomplete="off" spellcheck="false">
-          <button class="btn-primary" id="usernameImportBtn">
-            <svg class="icon"><use href="#icon-spark"/></svg>
-            Load List
+    <!-- Tier Builder Surface -->
+    <div class="m3-tier-surface">
+      <div class="tier-list-container" id="tierContainer">
+        <!-- Interactive Tier Rows Rendered Here -->
+      </div>
+    </div>
+
+    <!-- Unranked Collection Tray -->
+    <div class="m3-unranked-surface">
+      <div class="m3-unranked-header">
+        <div class="unranked-title-block">
+          <div class="m3-title-dot"></div>
+          <h3 class="m3-section-heading">Unranked Collection</h3>
+          <span class="m3-count-badge" id="unrankedCountBadge">0</span>
+        </div>
+
+        <div class="unranked-controls-block">
+          <select id="unrankedSortSelect" class="m3-select-box">
+            <option value="default">Sort: Default</option>
+            <option value="score">Sort: AniList Score (High &rarr; Low)</option>
+            <option value="title">Sort: Title (A &rarr; Z)</option>
+          </select>
+          <button class="m3-btn-text btn-sm" id="clearPlacementsBtn" title="Reset tier placements back to unranked">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <span>Reset Placements</span>
+          </button>
+          <button class="m3-btn-text btn-sm" id="clearUnrankedBtn" title="Clear unranked pool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Clear Unranked</span>
+          </button>
+          <button class="m3-btn-text btn-sm text-danger" id="clearEntireListBtn" title="Delete all items">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Delete All</span>
           </button>
         </div>
-        <p class="modal-hint">No password or token required for public AniList profiles!</p>
       </div>
 
-      <!-- Tab 2: Google Sign-In -->
-      <div class="auth-tab-content" id="tabGoogle">
-        <h2 class="modal-title">Sign in with Google</h2>
-        <p class="modal-subtitle">Save and sync your custom tier lists securely with your Google profile across sessions.</p>
+      <div class="m3-unranked-grid" id="unrankedGrid">
+        <!-- Unranked draggable items rendered here -->
+      </div>
+    </div>
+  </main>
 
-        <button class="btn-google-login" id="googleSignInBtn">
-          <svg class="icon"><use href="#icon-google"/></svg>
-          Continue with Google
+  <!-- M3 Dialog: AniList Connect & Username Load -->
+  <div class="m3-dialog-overlay" id="loginModal">
+    <div class="m3-dialog m3-dialog-auth">
+      <button class="m3-dialog-close-btn" id="closeLoginModal" title="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="m3-dialog-tabs">
+        <button class="m3-dialog-tab active" data-tab="username">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Username Load</span>
         </button>
-
-        <div class="google-custom-box" style="margin-top: 16px;">
-          <p class="modal-hint center">Or customize your Google display name:</p>
-          <div class="token-input-row">
-            <input type="text" id="googleNameInput" placeholder="Your Name or Profile Handle" autocomplete="off" spellcheck="false">
-            <button class="btn-primary" id="googleConnectBtn">Save Profile</button>
-          </div>
-        </div>
+        <button class="m3-dialog-tab" data-tab="oauth">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.361 2.843h4.423l5.068 18.314H11.43L10.3 16.7H5.215l-1.077 4.457H0L6.361 2.843zm3.176 10.222L7.75 6.643h-.114l-1.787 6.422h3.688zM24 17.571a3.57 3.57 0 1 1-7.143 0 3.57 3.57 0 0 1 7.143 0z"/></svg>
+          <span>AniList OAuth</span>
+        </button>
+        <button class="m3-dialog-tab" data-tab="token">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Manual Token</span>
+        </button>
       </div>
 
-      <!-- Tab 3: Token OAuth -->
-      <div class="auth-tab-content" id="tabToken">
-        <h2 class="modal-title">AniList Token Authorization</h2>
-        <p class="modal-subtitle">Connect via official AniList OAuth token for private lists and account sync.</p>
+      <!-- Tab 1: Username Import (Primary) -->
+      <div class="m3-tab-content active" id="tabUsername">
+        <h3 class="m3-dialog-title">Load AniList Collection</h3>
+        <p class="m3-dialog-subtitle">Enter any AniList username or profile link to pull all completed, watching, planning, paused, and dropped entries.</p>
 
-        <button class="btn-anilist" id="loginBtn">
-          <span class="anilist-dot"></span>
-          <span id="loginBtnLabel">1. Open AniList Authorization Page</span>
-        </button>
-
-        <div class="login-steps" id="loginSteps">
-          <p><strong>Quick 3-Step Guide:</strong></p>
-          <ol>
-            <li>Click the button above to authorize on AniList.</li>
-            <li>Copy your access token or the redirect page URL.</li>
-            <li>Paste it below and click <strong>Connect</strong>.</li>
-          </ol>
-        </div>
-
-        <div class="token-input-row">
-          <input type="password" id="tokenInput" placeholder="Paste access token or PIN URL here" autocomplete="off" spellcheck="false">
-          <button class="btn-primary" id="tokenConnectBtn">Connect</button>
-        </div>
-        <div class="hidden" id="manualAuthWrap">
-          <p class="modal-hint center">Popup blocked? Click here:
-            <a href="#" id="manualAuthLink" target="_blank" rel="noopener" class="hint-link">Open AniList authorization in new tab</a>
-          </p>
-        </div>
-
-        <div class="auth-fallback-box" style="margin-top: 14px; padding: 12px; background: var(--bg-tertiary); border-radius: 10px; text-align: center; font-size: 13px;">
-          <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Having token or authorization issues?</p>
-          <button class="btn-secondary btn-sm" id="switchToUsernameBtn" style="width: 100%;">
-            <svg class="icon"><use href="#icon-user"/></svg>
-            Switch to Web Access (Recommended &amp; Error-Free)
+        <div class="m3-field-action-row">
+          <input type="text" id="usernameImportInput" class="m3-text-field" placeholder="AniList username (e.g. gigguk, Lost-4Ever)" autocomplete="off">
+          <button class="m3-btn-filled" id="usernameImportBtn">
+            <span>Load List</span>
           </button>
         </div>
 
-        <details class="advanced-settings" style="margin-top: 12px;">
-          <summary>Advanced: Client ID Settings</summary>
-          <p class="advanced-text">To use a custom AniList API Client ID, set its redirect URL on AniList to <code>https://anilist.co/api/v2/oauth/pin</code>:</p>
-          <div class="token-input-row">
-            <input type="text" id="clientIdInput" placeholder="Client ID (default 4410)" autocomplete="off" spellcheck="false">
-            <button class="btn-secondary" id="clientIdSaveBtn">Save</button>
+        <div class="m3-callout-card mt-3">
+          <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span class="text-sm">No password or authorization required for public AniList profiles.</span>
+        </div>
+      </div>
+
+      <!-- Tab 2: AniList OAuth -->
+      <div class="m3-tab-content" id="tabOauth">
+        <h3 class="m3-dialog-title">AniList OAuth Connect</h3>
+        <p class="m3-dialog-subtitle">Authorize directly with AniList to access private lists and sync scores or progress back to your account.</p>
+
+        <button class="m3-btn-anilist-oauth" id="loginOAuthBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.361 2.843h4.423l5.068 18.314H11.43L10.3 16.7H5.215l-1.077 4.457H0L6.361 2.843zm3.176 10.222L7.75 6.643h-.114l-1.787 6.422h3.688zM24 17.571a3.57 3.57 0 1 1-7.143 0 3.57 3.57 0 0 1 7.143 0z"/></svg>
+          <span>Authorize on AniList</span>
+        </button>
+
+        <div class="popup-blocked-box hidden" id="popupBlockedWrap">
+          <p class="text-xs text-secondary">Popup blocked? Click below:</p>
+          <a href="#" id="popupBlockedLink" target="_blank" rel="noopener" class="text-primary text-xs font-bold">Open Authorization Tab &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Tab 3: Manual Token Paste -->
+      <div class="m3-tab-content" id="tabToken">
+        <h3 class="m3-dialog-title">Paste Token</h3>
+        <p class="m3-dialog-subtitle">If you have an AniList OAuth token or PIN URL, paste it here.</p>
+
+        <div class="m3-field-action-row">
+          <input type="password" id="manualTokenInput" class="m3-text-field" placeholder="Paste access token (eyJ...) or PIN URL" autocomplete="off">
+          <button class="m3-btn-filled" id="manualTokenConnectBtn">
+            <span>Connect</span>
+          </button>
+        </div>
+
+        <details class="m3-accordion mt-3">
+          <summary class="m3-accordion-summary">Advanced: Client ID Settings</summary>
+          <div class="m3-accordion-body">
+            <div class="m3-field-action-row mt-2">
+              <input type="text" id="settingClientIdInput" class="m3-text-field" placeholder="Client ID (Default: 4410)">
+              <button class="m3-btn-filled-tonal btn-sm" id="settingClientIdSaveBtn">Save</button>
+            </div>
           </div>
         </details>
       </div>
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal modal-settings">
-      <button class="modal-close" id="closeSettingsModal">
-        <svg class="icon"><use href="#icon-close"/></svg>
+  <!-- M3 Dialog: Settings & Export -->
+  <div class="m3-dialog-overlay" id="settingsModal">
+    <div class="m3-dialog m3-dialog-settings">
+      <button class="m3-dialog-close-btn" id="closeSettingsModal" title="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <h2 class="modal-title">Settings</h2>
-      <div class="settings-group">
-        <span class="settings-label">Theme</span>
-        <div class="theme-toggle" id="themeToggle">
-          <button class="theme-btn active" data-theme="dark">
-            <svg class="icon"><use href="#icon-moon"/></svg>
-            Dark
+
+      <h3 class="m3-dialog-title">Settings &amp; Data</h3>
+
+      <div class="m3-settings-group">
+        <label class="m3-label">Theme</label>
+        <div class="m3-theme-segmented">
+          <button class="m3-theme-chip active" data-theme="dark">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
           </button>
-          <button class="theme-btn" data-theme="light">
-            <svg class="icon"><use href="#icon-sun"/></svg>
-            Light
+          <button class="m3-theme-chip" data-theme="light">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            <span>Light</span>
           </button>
-        </div>
-      </div>
-      <div class="settings-group">
-        <span class="settings-label">Export & Backup</span>
-        <div class="settings-actions">
-          <button class="btn-secondary" id="exportImageBtn">
-            <svg class="icon"><use href="#icon-image"/></svg>
-            Export as Image (PNG)
-          </button>
-          <button class="btn-secondary" id="exportBtn">
-            <svg class="icon"><use href="#icon-download"/></svg>
-            Export JSON
-          </button>
-          <button class="btn-secondary" id="resetBtn">
-            <svg class="icon"><use href="#icon-trash"/></svg>
-            Reset Tier List
+          <button class="m3-theme-chip" data-theme="oled">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+            <span>OLED</span>
           </button>
         </div>
       </div>
-      <div class="settings-group">
-        <span class="settings-label">About</span>
-        <p class="about-text">AniTier - Create beautiful, shareable tier lists from your AniList anime &amp; manga collection.</p>
+
+      <div class="m3-settings-group">
+        <label class="m3-label">Backup &amp; Export</label>
+        <div class="m3-btn-grid">
+          <button class="m3-btn-filled-tonal" id="exportImageBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Export Image (PNG)</span>
+          </button>
+          <button class="m3-btn-filled-tonal" id="exportBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export JSON</span>
+          </button>
+          <label class="m3-btn-filled-tonal file-upload-btn" for="importJsonInput">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Import JSON</span>
+            <input type="file" id="importJsonInput" accept=".json" class="hidden">
+          </label>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo">
-        <svg class="icon logo-icon"><use href="#icon-spark"/></svg>
-        <span class="logo-text">Ani<span class="logo-accent">Tier</span></span>
-      </div>
-    </div>
-    <div class="header-center">
-      <div class="search-box">
-        <svg class="icon search-icon"><use href="#icon-search"/></svg>
-        <input type="text" id="searchInput" placeholder="Search and quick-add anime or manga...">
-        <div class="search-results" id="searchResults"></div>
-      </div>
-    </div>
-    <div class="header-right">
-      <button class="btn-secondary" id="addAnimeBtn" title="Quick add anime">
-        <svg class="icon"><use href="#icon-plus"/></svg>
-        Quick Add
+  <!-- M3 Dialog: Media Details Inspector -->
+  <div class="m3-dialog-overlay" id="mediaDetailsModal">
+    <div class="m3-dialog m3-dialog-media">
+      <button class="m3-dialog-close-btn" title="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <div class="user-area">
-        <div class="user-logged-out" id="userLoggedOut">
-          <button class="btn-login" id="openLoginModal">
-            <svg class="icon"><use href="#icon-user"/></svg>
-            Load List / Login
-          </button>
-        </div>
-        <div class="user-logged-in hidden" id="userLoggedIn">
-          <div class="avatar" id="avatar"></div>
-          <span class="username" id="username"></span>
-          <button class="btn-icon" id="syncBtn" title="Refresh/Sync from AniList">
-            <svg class="icon"><use href="#icon-refresh"/></svg>
-          </button>
-          <button class="btn-icon" id="logoutBtn" title="Change Account / Clear">
-            <svg class="icon"><use href="#icon-logout"/></svg>
-          </button>
-        </div>
+      <div class="modal-media-body">
+        <!-- Injected dynamically by media-modal.js -->
       </div>
-      <button class="btn-icon" id="openSettingsModal" title="Settings">
-        <svg class="icon"><use href="#icon-settings"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Collection Control Bar -->
-  <div class="collection-bar hidden" id="collectionBar">
-    <div class="collection-info">
-      <span class="collection-user" id="collectionUser">Collection:</span>
-      <span class="collection-count" id="collectionCount">0 items</span>
-    </div>
-    <div class="collection-controls">
-      <div class="type-toggle">
-        <button class="type-btn active" id="typeAnimeBtn" data-type="ANIME">Anime</button>
-        <button class="type-btn" id="typeMangaBtn" data-type="MANGA">Manga</button>
-      </div>
-      <div class="status-filters" id="statusFilters">
-        <button class="filter-pill active" data-status="ALL">All</button>
-        <button class="filter-pill" data-status="COMPLETED">Completed</button>
-        <button class="filter-pill" data-status="CURRENT">Watching/Reading</button>
-        <button class="filter-pill" data-status="PLANNING">Planning</button>
-        <button class="filter-pill" data-status="PAUSED">Paused</button>
-        <button class="filter-pill" data-status="DROPPED">Dropped</button>
-      </div>
-      <button class="btn-secondary btn-sm" id="headerExportImageBtn" title="Export Tier List Image">
-        <svg class="icon"><use href="#icon-image"/></svg>
-        Export PNG
-      </button>
-      <button class="btn-danger btn-sm" id="clearEntireListBtn" title="Delete & Clear Complete Entire List">
-        <svg class="icon"><use href="#icon-trash"/></svg>
-        Delete Entire List
-      </button>
     </div>
   </div>
 
-  <!-- Main -->
-  <main class="main" id="mainContainer">
-    <div class="empty-state" id="emptyState">
-      <div class="empty-icon">
-        <svg class="icon"><use href="#icon-spark"/></svg>
-      </div>
-      <h2>Build your AniList Tier List</h2>
-      <p>Enter your AniList username below to load your collection instantly!</p>
+  <!-- M3 Toast Notification -->
+  <div class="m3-snackbar" id="toast"></div>
 
-      <div class="hero-import-box">
-        <input type="text" id="heroUsernameInput" placeholder="AniList Username (e.g. LOST-4EVER)" autocomplete="off" spellcheck="false">
-        <button class="btn-primary" id="heroImportBtn">
-          <svg class="icon"><use href="#icon-spark"/></svg>
-          Load My List
-        </button>
-      </div>
-
-      <div class="hero-divider"><span>OR</span></div>
-
-      <button class="btn-secondary" id="emptyLoginBtn">
-        <svg class="icon"><use href="#icon-user"/></svg>
-        Log in with Token
-      </button>
-    </div>
-
-    <div class="tier-list-container" id="tierContainer">
-      <!-- Tier rows will be dynamically generated -->
-    </div>
-
-    <div class="unranked-section" id="unrankedSection">
-      <div class="unranked-header">
-        <div class="unranked-header-left">
-          <h3 class="section-title">
-            <svg class="icon"><use href="#icon-star"/></svg>
-            AniList Unranked Collection <span class="unranked-badge" id="unrankedCountBadge">0</span>
-          </h3>
-          <div class="status-filters" id="bottomStatusFilters">
-            <button class="filter-pill active" data-status="ALL" id="pill-ALL">All <span class="pill-count" id="count-ALL">0</span></button>
-            <button class="filter-pill" data-status="COMPLETED" id="pill-COMPLETED">Completed <span class="pill-count" id="count-COMPLETED">0</span></button>
-            <button class="filter-pill" data-status="CURRENT" id="pill-CURRENT">Watching/Reading <span class="pill-count" id="count-CURRENT">0</span></button>
-            <button class="filter-pill" data-status="PLANNING" id="pill-PLANNING">Planning <span class="pill-count" id="count-PLANNING">0</span></button>
-            <button class="filter-pill" data-status="PAUSED" id="pill-PAUSED">Paused <span class="pill-count" id="count-PAUSED">0</span></button>
-            <button class="filter-pill" data-status="DROPPED" id="pill-DROPPED">Dropped <span class="pill-count" id="count-DROPPED">0</span></button>
-          </div>
-        </div>
-        <div class="unranked-actions">
-          <select id="unrankedSortSelect" class="sort-select">
-            <option value="default">Sort: Default</option>
-            <option value="score">Sort: Score (High to Low)</option>
-            <option value="title">Sort: Title (A-Z)</option>
-          </select>
-          <button class="btn-secondary btn-sm" id="clearUnrankedBtn">Clear Unranked</button>
-        </div>
-      </div>
-      <div class="unranked-grid" id="unrankedGrid"></div>
-    </div>
-  </main>
-
-  <!-- Floating toolbar -->
-  <div class="floating-tools">
-    <button class="btn-fab" id="addTierBtn" title="Add Tier">
-      <svg class="icon"><use href="#icon-plus"/></svg>
-    </button>
-  </div>
-
-  <template id="tierRowTemplate">
-    <div class="tier-row">
-      <div class="tier-label"></div>
-      <div class="tier-items"></div>
-    </div>
-  </template>
-
-  <template id="itemTemplate">
-    <div class="tier-item">
-      <img class="item-cover" loading="lazy">
-      <div class="item-tooltip">
-        <span class="item-tooltip-title"></span>
-        <span class="item-tooltip-score"></span>
-      </div>
-      <button class="item-remove">
-        <svg class="icon"><use href="#icon-x"/></svg>
-      </button>
-    </div>
-  </template>
-
+  <!-- External libraries -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- Modular Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/media-modal.js"></script>
+  <script src="js/tierlist.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

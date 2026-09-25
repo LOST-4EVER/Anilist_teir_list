@@ -1,55 +1,98 @@
-# AniTier - AniList Tier List
+# AniTier - Material Design 3 AniList Tier List Maker
 
-A beautiful, modern tier list builder powered by your AniList account. Dark & light mode, drag-and-drop tiers, search and import from AniList.
+> Build, rank, and export beautiful anime & manga tier lists directly from your AniList library.
 
-## Live Site
+AniTier connects directly with AniList's GraphQL API to fetch your anime and manga collections and rank them in a modern, interactive Material Design 3 (Material You) tier list maker.
 
-https://LOST-4EVER.github.io/Anilist_teir_list/
+---
 
-## Features
+## ✨ Features
 
-- 🏆 Drag-and-drop tier list builder
-- 🔍 Search & add anime / manga from AniList
-- 🔐 Login with your AniList account to auto-import your list
-- 🌙 / ☀️ Dark & light theme toggle (in Settings)
-- 📦 Export your tier list as JSON
-- ✅ Fully client-side, no backend required (runs on GitHub Pages)
+- **⚡ Instant AniList Ingestion (No Password Required)**:
+  - Enter any public AniList username or profile link (`https://anilist.co/user/...`) to load your entire library in seconds.
+  - Multi-chunk pagination support for large collections (handles 1,000+ entries effortlessly).
+  - Instant presets for **Top Rated Anime**, **Trending Anime**, and sample accounts.
 
-## Local Development
+- **🎨 Material Design 3 UI & Animations**:
+  - Expressive motion curves (`cubic-bezier(0.2, 0.0, 0.0, 1.0)`) with smooth elevation shadows.
+  - 3 Crafted Themes: **Cyber Dark**, **Clean Light**, and **Midnight OLED**.
+  - 100% Crisp Vector SVG icons (zero emoji placeholders).
+  - Responsive layout optimized for desktop, tablets, and mobile screens.
 
-```bash
-npm install
-npm start
-# -> http://localhost:3000
+- **🏆 Powerful Tier List Engine**:
+  - **Fluid Drag-and-Drop**: Drag entries directly into tiers with dropzone indicators and touch drag ghost support on mobile.
+  - **Auto-Rank by AniList Score**: Automatically places unranked items into tiers (S, A, B, C, D, F) based on user ratings with one click.
+  - **Full Tier Customization**: Rename tier labels inline, pick custom colors with the built-in color picker, add new tiers, or reorder tiers up/down.
+  - **Unranked Pool Controls**: Filter by AniList status (*Completed*, *Watching/Reading*, *Planning*, *Paused*, *Dropped*) or sort by score and title (A-Z).
+
+- **🔍 Media Inspector & Quick Search**:
+  - Real-time live search with debounced autocomplete for any title in the entire AniList database.
+  - Interactive inspector modal with synopsis, genres, format, episode counts, studio, and trailers.
+
+- **💾 Export & Backup**:
+  - **High-Res PNG Export**: Generates a clean, watermark-branded screenshot ready for sharing on social media or Discord.
+  - **JSON Backup & Restore**: Export and import your complete tier list state as a JSON file.
+  - **Local Persistence**: State auto-saves to `localStorage` so you never lose your rankings across sessions.
+
+---
+
+## 📁 Project Architecture
+
+```text
+├── server.js               # Express server (static file hosting, /api/proxy-image)
+├── package.json            # Dependencies and scripts
+├── .env.example            # Environment variables (PORT, CLIENT_ID)
+├── README.md               # Project documentation
+└── public/
+    ├── index.html          # Material 3 Semantic HTML5 markup
+    ├── callback.html       # OAuth popup receiver page
+    ├── css/
+    │   └── style.css       # Material 3 CSS tokens, elevations & responsive layout
+    └── js/
+        ├── api.js          # AniList GraphQL client (queries & mutations)
+        ├── auth.js         # Authentication manager (OAuth, token, web profile)
+        ├── icons.js        # Pure SVG icon registry
+        ├── tierlist.js     # Drag-and-drop tier list core engine
+        ├── media-modal.js  # Media details inspector dialog
+        ├── export.js       # HTML2Canvas PNG export & JSON state manager
+        ├── ui.js           # Material 3 theme controller, dialogs & toasts
+        └── app.js          # Main application orchestrator & state manager
 ```
 
-## GitHub Pages Deployment
+---
 
-The site is deployed via a GitHub Actions workflow (see `.github/workflows/deploy.yml`) which publishes the `public/` folder to GitHub Pages on every push to `main`. The **Settings -> Pages** source must be set to **GitHub Actions**.
+## 🚀 Getting Started
 
-### AniList OAuth (Login)
+### Prerequisites
+- Node.js (v18 or higher)
+- npm
 
-**No setup needed.** Login uses AniList's built-in **Auth Pin flow** with the public demo client — you don't need to create your own API client:
+### Installation & Running Locally
 
-1. Open the app and click **Login**.
-2. Click **Continue with AniList** and log in / approve on AniList.
-3. AniList shows your **access token** with a copy button — copy it.
-4. Return to the app and paste the token in the box (it connects automatically).
+1. **Clone the repository and install dependencies**:
+   ```bash
+   npm install
+   ```
 
-Your token is stored only in your browser and stays valid for a year.
+2. **Start the development server**:
+   ```bash
+   npm start
+   ```
 
-> Optional: Prefer your own API client (same pin flow, your own rate limits)? Create a free client at https://anilist.co/settings/developer, set its **Redirect URL** to exactly `https://anilist.co/api/v2/oauth/pin`, then enter your **Client ID** under the *Advanced* section of the login modal.
+3. **Open in browser**:
+   Navigate to `http://localhost:3000`
 
-## Project Structure
+---
 
-```
-public/
-├── index.html        # Main app
-├── callback.html     # OAuth callback (popup)
-├── css/style.css     # Styles (dark/light)
-└── js/app.js         # App logic (AniList API, DnD, theme)
-server.js             # Optional local dev server (Express)
-.github/workflows/    # GitHub Pages deployment
-```
+## 🛠️ Configuration & API Integration
 
-> Note: Login uses AniList's OAuth **Auth Pin flow** (copy-paste the token shown by AniList) — this works with the public demo client and needs no account or registration.
+- **AniList Public GraphQL Endpoint**: `https://graphql.anilist.co` (No API key required for public user lists or media search).
+- **AniList OAuth (Optional)**: If you want to connect your own AniList Developer Client ID for live 2-way sync:
+  - Add your client ID in the **Settings Dialog** or in `.env` under `CLIENT_ID`.
+  - Redirect URI: `http://localhost:3000/callback.html`
+
+---
+
+## 📄 License
+
+MIT License. AniList is a trademark of AniList.co. This project is an independent community application.
