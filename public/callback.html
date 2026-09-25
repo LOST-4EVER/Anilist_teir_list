@@ -71,8 +71,9 @@
       const searchParams = new URLSearchParams(search);
       
       const token = hashParams.get('access_token') || searchParams.get('access_token');
+      const code = hashParams.get('code') || searchParams.get('code');
       const error = hashParams.get('error') || searchParams.get('error');
-      const errorDesc = hashParams.get('error_description') || searchParams.get('error_description');
+      const errorDesc = hashParams.get('error_description') || searchParams.get('error_description') || searchParams.get('message');
 
       const card = document.getElementById('statusCard');
       const spinner = document.getElementById('spinner');
@@ -83,21 +84,20 @@
         spinner.style.display = 'none';
         title.className = 'error';
         title.textContent = 'Authorization Failed';
-        msg.textContent = errorDesc || 'AniList authorization was cancelled or encountered an error.';
+        msg.textContent = errorDesc || 'AniList authorization returned an error: ' + error;
         if (window.opener) {
           window.opener.postMessage({ type: 'anitier-auth', error: errorDesc || error }, '*');
         }
         return;
       }
 
-      if (token) {
-        // Fetch viewer profile to verify token and obtain user details
+      function verifyAndComplete(accessToken) {
         fetch(ANILIST_API, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token
+            'Authorization': 'Bearer ' + accessToken
           },
           body: JSON.stringify({
             query: `query { Viewer { id name avatar { large medium } bannerImage } }`
@@ -114,14 +114,14 @@
           if (window.opener) {
             window.opener.postMessage({
               type: 'anitier-auth',
-              token: token,
+              token: accessToken,
               user: user
             }, '*');
             setTimeout(() => {
               window.close();
             }, 800);
           } else {
-            msg.innerHTML += '<div class="token-box">Your Token: ' + token.substring(0, 15) + '...</div><p style="margin-top:10px;">Return to AniTier and paste this token if needed.</p>';
+            msg.innerHTML += '<div class="token-box">Your Token: ' + accessToken.substring(0, 15) + '...</div><p style="margin-top:10px;">Return to AniTier and paste this token if needed.</p>';
           }
         })
         .catch(err => {
@@ -130,14 +130,57 @@
           title.textContent = 'Verification Failed';
           msg.textContent = 'Could not verify token with AniList API.';
           if (window.opener) {
-            window.opener.postMessage({ type: 'anitier-auth', token: token, user: null }, '*');
+            window.opener.postMessage({ type: 'anitier-auth', token: accessToken, user: null }, '*');
+          }
+        });
+      }
+
+      if (token) {
+        verifyAndComplete(token);
+      } else if (code) {
+        // Exchange authorization code via server token endpoint
+        title.textContent = 'Exchanging Code...';
+        const cleanRedirectUri = window.location.origin + window.location.pathname;
+        const customClientId = localStorage.getItem('anitier-clientid') || '4410';
+
+        fetch('/api/auth/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: code,
+            redirectUri: cleanRedirectUri,
+            clientId: customClientId
+          })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.access_token) {
+            verifyAndComplete(data.access_token);
+          } else {
+            spinner.style.display = 'none';
+            title.className = 'error';
+            title.textContent = 'Token Exchange Failed';
+            const errMsg = data.message || data.error || 'Failed to exchange authorization code.';
+            msg.textContent = errMsg;
+            if (window.opener) {
+              window.opener.postMessage({ type: 'anitier-auth', error: errMsg }, '*');
+            }
+          }
+        })
+        .catch(err => {
+          spinner.style.display = 'none';
+          title.className = 'error';
+          title.textContent = 'Token Exchange Error';
+          msg.textContent = err.message || 'Server network error during code exchange.';
+          if (window.opener) {
+            window.opener.postMessage({ type: 'anitier-auth', error: err.message }, '*');
           }
         });
       } else {
         spinner.style.display = 'none';
         title.className = 'error';
-        title.textContent = 'No Token Found';
-        msg.textContent = 'No access token was returned by AniList.';
+        title.textContent = 'No Token or Code Found';
+        msg.textContent = 'No access token or authorization code was returned by AniList.';
       }
     })();
   </script>

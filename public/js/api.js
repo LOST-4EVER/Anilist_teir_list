@@ -187,6 +187,43 @@ window.AniApi = (function () {
     return data.Page?.media || [];
   }
 
+  // Fetch browse/explorer list with genre and category filters
+  async function fetchBrowseList({ category = 'TRENDING', type = 'ANIME', page = 1, perPage = 28, genre = 'ALL' }) {
+    let sort = ['TRENDING_DESC'];
+    if (category === 'POPULAR') sort = ['POPULARITY_DESC'];
+    if (category === 'TOP_RATED') sort = ['SCORE_DESC'];
+    if (category === 'NEWEST') sort = ['START_DATE_DESC'];
+
+    const query = `
+      query ($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort], $genre: String) {
+        Page(page: $page, perPage: $perPage) {
+          media(type: $type, sort: $sort, genre: $genre) {
+            id
+            title { romaji english native }
+            coverImage { extraLarge large color }
+            bannerImage
+            averageScore
+            popularity
+            format
+            episodes
+            chapters
+            genres
+            seasonYear
+            status
+            type
+            description(asHtml: false)
+          }
+        }
+      }
+    `;
+
+    const vars = { page, perPage, type, sort };
+    if (genre && genre !== 'ALL') vars.genre = genre;
+
+    const data = await request(query, vars);
+    return data.Page?.media || [];
+  }
+
   // Search Media with rich fields
   async function searchMedia(search, type = 'ANIME', page = 1, perPage = 12) {
     const query = `
@@ -355,6 +392,7 @@ window.AniApi = (function () {
     fetchViewer,
     fetchUserCollection,
     fetchPresetMedia,
+    fetchBrowseList,
     searchMedia,
     fetchMediaDetails,
     saveMediaListEntry,

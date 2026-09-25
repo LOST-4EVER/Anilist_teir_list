@@ -2,6 +2,8 @@
 
 > Build, rank, and export beautiful anime & manga tier lists directly from your AniList library.
 
+🌐 **Live GitHub Pages App**: [https://lost-4ever.github.io/Anilist_teir_list/](https://lost-4ever.github.io/Anilist_teir_list/)
+
 AniTier connects directly with AniList's GraphQL API to fetch your anime and manga collections and rank them in a modern, interactive Material Design 3 (Material You) tier list maker.
 
 ---

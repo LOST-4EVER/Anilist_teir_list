@@ -15,15 +15,70 @@ app.get('/api/auth/url', (req, res) => {
   const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
   const host = req.headers['x-forwarded-host'] || req.get('host');
   const redirectUri = `${protocol}://${host}/callback.html`;
+  const customClientId = req.query.client_id || CLIENT_ID;
   
-  const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token`;
+  const tokenAuthUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(customClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token`;
+  const codeAuthUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(customClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
   
   res.json({
-    clientId: CLIENT_ID,
+    clientId: customClientId,
     redirectUri,
-    pinUrl: 'https://anilist.co/api/v2/oauth/pin',
-    url: authUrl
+    pinUrl: `https://anilist.co/api/v2/oauth/authorize?client_id=${encodeURIComponent(customClientId)}&response_type=code`,
+    url: tokenAuthUrl,
+    codeUrl: codeAuthUrl
   });
+});
+
+// OAuth Token Exchange Proxy Endpoint
+app.post('/api/auth/token', (req, res) => {
+  const { code, redirectUri, clientId, clientSecret } = req.body || {};
+  if (!code) {
+    return res.status(400).json({ error: 'invalid_request', message: 'Missing required authorization code parameter' });
+  }
+
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  const defaultRedirectUri = `${protocol}://${host}/callback.html`;
+
+  const payload = JSON.stringify({
+    grant_type: 'authorization_code',
+    client_id: clientId || CLIENT_ID,
+    client_secret: clientSecret || process.env.CLIENT_SECRET || process.env.ANILIST_CLIENT_SECRET || '',
+    redirect_uri: redirectUri || defaultRedirectUri,
+    code: String(code).trim()
+  });
+
+  const options = {
+    hostname: 'anilist.co',
+    path: '/api/v2/oauth/token',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Content-Length': Buffer.byteLength(payload)
+    }
+  };
+
+  const tokenReq = https.request(options, (tokenRes) => {
+    let body = '';
+    tokenRes.on('data', (chunk) => body += chunk);
+    tokenRes.on('end', () => {
+      try {
+        const json = JSON.parse(body);
+        res.status(tokenRes.statusCode || 200).json(json);
+      } catch (err) {
+        res.status(502).json({ error: 'invalid_response', message: 'Invalid response from AniList token server' });
+      }
+    });
+  });
+
+  tokenReq.on('error', (err) => {
+    console.error('AniList token request error:', err.message);
+    res.status(502).json({ error: 'network_error', message: err.message || 'Failed to communicate with AniList token server' });
+  });
+
+  tokenReq.write(payload);
+  tokenReq.end();
 });
 
 // OAuth Callback handlers

@@ -81,13 +81,44 @@ window.AniExport = (function () {
       // Remove any interactive tools or inputs from clone
       clone.querySelectorAll('.label-tools, .item-remove, .item-quick-move, .color-picker-input, .quick-move-popover').forEach(el => el.remove());
 
-      // Route cover images through local proxy to prevent cross-origin canvas taint
-      clone.querySelectorAll('img').forEach(img => {
-        if (img.src && (img.src.includes('s4.anilist.co') || img.src.includes('anilist.co'))) {
-          img.crossOrigin = 'anonymous';
-          img.src = `/api/proxy-image?url=${encodeURIComponent(img.src)}`;
+      // Convert cover images to data URLs to ensure html2canvas never suffers from CORS taint on static hosts (GitHub Pages) or local servers
+      const imgElements = Array.from(clone.querySelectorAll('img'));
+      await Promise.all(imgElements.map(async (img) => {
+        if (!img.src || img.src.startsWith('data:')) return;
+        const originalSrc = img.src;
+        try {
+          // Direct fetch (AniList CDN supports CORS)
+          const res = await fetch(originalSrc, { mode: 'cors' });
+          if (res.ok) {
+            const blob = await res.blob();
+            const dataUrl = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            });
+            img.src = dataUrl;
+            return;
+          }
+        } catch (fetchErr) {
+          // If direct fetch fails (e.g. strict CORS), try local server proxy if available
+          try {
+            const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(originalSrc)}`);
+            if (proxyRes.ok) {
+              const blob = await proxyRes.blob();
+              const dataUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+              });
+              img.src = dataUrl;
+              return;
+            }
+          } catch (proxyErr) {
+            console.warn('Proxy image convert failed:', proxyErr);
+          }
         }
-      });
+        img.crossOrigin = 'anonymous';
+      }));
 
       exportWrapper.appendChild(clone);
       document.body.appendChild(exportWrapper);

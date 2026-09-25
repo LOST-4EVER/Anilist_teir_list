@@ -27,16 +27,54 @@ window.AniAuth = (function () {
     return `${window.location.origin}/callback.html`;
   }
 
-  function getAuthUrl() {
+  function getAuthUrl(responseType = 'token') {
     const clientId = getClientId();
     const redirectUri = encodeURIComponent(getRedirectUri());
-    return `${ANILIST_AUTH_URL}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${redirectUri}&response_type=token`;
+    return `${ANILIST_AUTH_URL}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${redirectUri}&response_type=${responseType}`;
   }
 
   function getPinAuthUrl() {
     const clientId = getClientId();
     const pinRedirect = encodeURIComponent(PIN_REDIRECT);
-    return `${ANILIST_AUTH_URL}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${pinRedirect}&response_type=token`;
+    return `${ANILIST_AUTH_URL}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${pinRedirect}&response_type=code`;
+  }
+
+  // Exchange authorization code or PIN for access token via backend proxy
+  async function exchangeCodeForToken(code, redirectUri = null) {
+    if (!code) throw new Error('Authorization code is required');
+    const clientId = getClientId();
+    const cleanRedirectUri = redirectUri || getRedirectUri();
+
+    let response;
+    try {
+      response = await fetch('/api/auth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: String(code).trim(),
+          redirectUri: cleanRedirectUri,
+          clientId: clientId
+        })
+      });
+    } catch (netErr) {
+      throw new Error('Token proxy unavailable on static host. Use Web Access mode to load your profile directly.');
+    }
+
+    if (response.status === 404) {
+      throw new Error('Server token proxy endpoint not found on static deployment. Use Web Access to load any AniList username.');
+    }
+
+    const data = await response.json();
+    if (!response.ok || data.error) {
+      const msg = data.message || data.error_description || data.error || 'Authorization code exchange failed';
+      throw new Error(msg);
+    }
+
+    if (!data.access_token) {
+      throw new Error('No access_token returned by token exchange server');
+    }
+
+    return data.access_token;
   }
 
   // Open Popup for OAuth
@@ -172,6 +210,7 @@ window.AniAuth = (function () {
     getAuthUrl,
     getPinAuthUrl,
     openAuthPopup,
+    exchangeCodeForToken,
     parseToken,
     parseUsername,
     onAuthChange,

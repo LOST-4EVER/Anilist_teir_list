@@ -190,39 +190,93 @@ window.AniApp = (function () {
       });
     }
 
-    // Manual Token Input Form
+    // Manual Token / PIN Input Form
     const tokenInput = document.getElementById('manualTokenInput');
     const tokenBtn = document.getElementById('manualTokenConnectBtn');
     const handleTokenConnect = async () => {
-      const raw = tokenInput?.value;
-      const parsed = window.AniAuth.parseToken(raw);
-      if (!parsed) {
-        // If user typed a username in token box, fall back gracefully
-        if (raw && !raw.includes('.') && raw.length < 35) {
-          loadUserLibrary(raw.trim());
-          window.AniUI.closeModal('loginModal');
-          return;
-        }
-        window.AniUI.showToast('Please paste a valid AniList OAuth access token', true);
+      const raw = tokenInput?.value?.trim();
+      if (!raw) {
+        window.AniUI.showToast('Please paste an access token or authorization code', true);
         return;
       }
 
-      window.AniUI.showToast('Verifying token with AniList...');
-      try {
-        const viewer = await window.AniApi.fetchViewer(parsed);
-        state.token = parsed;
-        state.user = viewer;
-        state.username = viewer.name;
-        persist();
-        window.AniUI.updateUserHeader();
-        window.AniUI.closeModal('loginModal');
-        window.AniUI.showToast(`Logged in as ${viewer.name}!`);
-        loadUserLibrary(viewer.name, parsed);
-        if (tokenInput) tokenInput.value = '';
-      } catch (err) {
-        console.error(err);
-        window.AniUI.showToast('Token invalid or expired. Try "Web Access" tab instead!', true);
+      // Check if URL or raw string contains code=...
+      let codeMatch = raw.match(/[?&#]code=([^&"'\s]+)/);
+      let potentialCode = codeMatch ? codeMatch[1] : null;
+
+      // Extract access_token if present in URL/JSON/Bearer format
+      let token = window.AniAuth.parseToken(raw);
+
+      window.AniUI.showToast('Authenticating with AniList...');
+
+      // Attempt 1: If input is a direct token (JWT/Bearer/long string), try fetching viewer
+      if (token && token.length > 50 && token.includes('.')) {
+        try {
+          const viewer = await window.AniApi.fetchViewer(token);
+          state.token = token;
+          state.user = viewer;
+          state.username = viewer.name;
+          persist();
+          window.AniUI.updateUserHeader();
+          window.AniUI.closeModal('loginModal');
+          window.AniUI.showToast(`Logged in as ${viewer.name}!`);
+          loadUserLibrary(viewer.name, token);
+          if (tokenInput) tokenInput.value = '';
+          return;
+        } catch (err) {
+          console.warn('Direct token validation failed, falling back to code exchange if applicable...', err);
+        }
       }
+
+      // Attempt 2: Treat input as an authorization code or PIN
+      const codeToExchange = potentialCode || raw;
+      if (codeToExchange) {
+        try {
+          const exchangedToken = await window.AniAuth.exchangeCodeForToken(codeToExchange, 'https://anilist.co/api/v2/oauth/pin');
+          const viewer = await window.AniApi.fetchViewer(exchangedToken);
+          state.token = exchangedToken;
+          state.user = viewer;
+          state.username = viewer.name;
+          persist();
+          window.AniUI.updateUserHeader();
+          window.AniUI.closeModal('loginModal');
+          window.AniUI.showToast(`Logged in as ${viewer.name}!`);
+          loadUserLibrary(viewer.name, exchangedToken);
+          if (tokenInput) tokenInput.value = '';
+          return;
+        } catch (exchangeErr) {
+          console.warn('PIN/Code exchange failed:', exchangeErr);
+        }
+      }
+
+      // Attempt 3: If parsed token was simpler/shorter, try viewer once more
+      if (token) {
+        try {
+          const viewer = await window.AniApi.fetchViewer(token);
+          state.token = token;
+          state.user = viewer;
+          state.username = viewer.name;
+          persist();
+          window.AniUI.updateUserHeader();
+          window.AniUI.closeModal('loginModal');
+          window.AniUI.showToast(`Logged in as ${viewer.name}!`);
+          loadUserLibrary(viewer.name, token);
+          if (tokenInput) tokenInput.value = '';
+          return;
+        } catch (err) {
+          console.error('Final token check failed:', err);
+        }
+      }
+
+      // Fallback: If raw input looks like a username, try public username load
+      if (!raw.includes('.') && raw.length < 35 && !raw.includes('http')) {
+        loadUserLibrary(raw);
+        window.AniUI.closeModal('loginModal');
+        if (tokenInput) tokenInput.value = '';
+        return;
+      }
+
+      window.AniUI.showToast('Invalid or expired token/code. Please check and try again.', true);
     };
 
     if (tokenBtn) tokenBtn.addEventListener('click', handleTokenConnect);
