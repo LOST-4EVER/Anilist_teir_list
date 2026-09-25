@@ -151,8 +151,6 @@ window.AniTierList = (function () {
 
       attachLabelEdit(labelContainer, tier);
     });
-
-    attachDragEvents();
   }
 
   function renderUnranked() {
@@ -176,13 +174,13 @@ window.AniTierList = (function () {
     });
 
     if (badge) badge.textContent = unranked.length;
-    attachDragEvents();
   }
 
   function renderAll() {
     renderTiers();
     renderUnranked();
     updateCollectionCounts();
+    attachDragEvents();
   }
 
   function createItemElement(media) {
@@ -410,11 +408,16 @@ window.AniTierList = (function () {
   /* ============ DRAG & DROP ============ */
   function attachDragEvents() {
     document.querySelectorAll('.tier-item').forEach(item => {
+      item.removeEventListener('dragstart', handleDragStart);
+      item.removeEventListener('dragend', handleDragEnd);
       item.addEventListener('dragstart', handleDragStart);
       item.addEventListener('dragend', handleDragEnd);
     });
 
-    document.querySelectorAll('.tier-items, .unranked-grid, .m3-unranked-grid, #unrankedGrid').forEach(dropzone => {
+    document.querySelectorAll('.tier-items, .tier-row, .unranked-grid, .m3-unranked-grid, #unrankedGrid, .m3-unranked-surface').forEach(dropzone => {
+      dropzone.removeEventListener('dragover', handleDragOver);
+      dropzone.removeEventListener('dragleave', handleDragLeave);
+      dropzone.removeEventListener('drop', handleDrop);
       dropzone.addEventListener('dragover', handleDragOver);
       dropzone.addEventListener('dragleave', handleDragLeave);
       dropzone.addEventListener('drop', handleDrop);
@@ -435,47 +438,94 @@ window.AniTierList = (function () {
     if (draggedEl) draggedEl.classList.remove('dragging');
     draggedEl = null;
     draggedMediaId = null;
-    document.querySelectorAll('.tier-row').forEach(r => r.classList.remove('dragover'));
-    document.querySelectorAll('.m3-unranked-surface, .unranked-section, .unranked-tray-wrapper').forEach(r => r.classList.remove('dragover'));
+    document.querySelectorAll('.tier-row, .m3-unranked-surface').forEach(r => r.classList.remove('dragover'));
+    document.querySelectorAll('.tier-item').forEach(i => i.classList.remove('drop-target-before', 'drop-target-after'));
   }
 
   function handleDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+
     const row = e.currentTarget.closest('.tier-row');
-    if (row) row.classList.add('dragover');
-    else {
-      const surface = e.currentTarget.closest('.m3-unranked-surface, .unranked-tray-wrapper, .unranked-section');
+    if (row) {
+      document.querySelectorAll('.tier-row').forEach(r => { if (r !== row) r.classList.remove('dragover'); });
+      row.classList.add('dragover');
+    } else {
+      const surface = e.currentTarget.closest('.m3-unranked-surface');
       if (surface) surface.classList.add('dragover');
+    }
+
+    // Handle item drop position indicators
+    const targetItem = e.target.closest('.tier-item');
+    document.querySelectorAll('.tier-item').forEach(i => i.classList.remove('drop-target-before', 'drop-target-after'));
+    if (targetItem && targetItem !== draggedEl) {
+      const rect = targetItem.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      if (relX < rect.width / 2) {
+        targetItem.classList.add('drop-target-before');
+      } else {
+        targetItem.classList.add('drop-target-after');
+      }
     }
   }
 
   function handleDragLeave(e) {
     const row = e.currentTarget.closest('.tier-row');
-    if (row) row.classList.remove('dragover');
-    else {
-      const surface = e.currentTarget.closest('.m3-unranked-surface, .unranked-tray-wrapper, .unranked-section');
-      if (surface) surface.classList.remove('dragover');
+    if (row && !row.contains(e.relatedTarget)) {
+      row.classList.remove('dragover');
+    }
+    const targetItem = e.target.closest('.tier-item');
+    if (targetItem) {
+      targetItem.classList.remove('drop-target-before', 'drop-target-after');
     }
   }
 
   function handleDrop(e) {
     e.preventDefault();
-    document.querySelectorAll('.tier-row').forEach(r => r.classList.remove('dragover'));
-    document.querySelectorAll('.m3-unranked-surface, .unranked-tray-wrapper, .unranked-section').forEach(r => r.classList.remove('dragover'));
+    document.querySelectorAll('.tier-row, .m3-unranked-surface').forEach(r => r.classList.remove('dragover'));
+    document.querySelectorAll('.tier-item').forEach(i => i.classList.remove('drop-target-before', 'drop-target-after'));
 
     const mediaId = e.dataTransfer.getData('text/plain') || draggedMediaId;
     if (!mediaId) return;
 
-    const dropzone = e.currentTarget;
-    const isUnranked = dropzone.classList.contains('unranked-grid') || dropzone.classList.contains('m3-unranked-grid') || dropzone.id === 'unrankedGrid';
-    const targetTierId = isUnranked ? null : dropzone.dataset.tierId;
+    const targetItem = e.target.closest('.tier-item');
+    const targetDropzone = e.currentTarget;
+
+    let targetTierId = null;
+    const tierRow = e.target.closest('.tier-row') || targetDropzone.closest('.tier-row');
+    if (tierRow) {
+      targetTierId = tierRow.dataset.tierId;
+    } else {
+      const itemsContainer = e.target.closest('.tier-items') || targetDropzone.closest('.tier-items');
+      if (itemsContainer) targetTierId = itemsContainer.dataset.tierId;
+    }
 
     const state = window.AniApp.getState();
-    const media = state.media.find(m => String(m.id) === String(mediaId));
-    if (!media) return;
+    const mediaIndex = state.media.findIndex(m => String(m.id) === String(mediaId));
+    if (mediaIndex === -1) return;
 
-    media.tier = targetTierId;
+    const draggedMedia = state.media[mediaIndex];
+    draggedMedia.tier = targetTierId;
+
+    // If dropped on an existing item, reorder relative to target item
+    if (targetItem && targetItem.dataset.mediaId && targetItem.dataset.mediaId !== String(mediaId)) {
+      const targetMediaId = targetItem.dataset.mediaId;
+      const targetIndex = state.media.findIndex(m => String(m.id) === String(targetMediaId));
+
+      if (targetIndex !== -1) {
+        state.media.splice(mediaIndex, 1);
+        const rect = targetItem.getBoundingClientRect();
+        const relX = e.clientX - rect.left;
+        let insertIndex = targetIndex;
+        if (relX >= rect.width / 2 && mediaIndex < targetIndex) {
+          insertIndex = targetIndex;
+        } else if (relX >= rect.width / 2) {
+          insertIndex = targetIndex + 1;
+        }
+        state.media.splice(insertIndex, 0, draggedMedia);
+      }
+    }
+
     window.AniApp.persist();
     renderAll();
     window.AniUI.showToast(targetTierId ? `Moved to tier ${getTierLabel(targetTierId)}` : 'Moved to unranked pool');
@@ -493,6 +543,7 @@ window.AniTierList = (function () {
       startX = touch.clientX;
       startY = touch.clientY;
       draggedMediaId = item.dataset.mediaId;
+      draggedEl = item;
     }, { passive: true });
 
     item.addEventListener('touchmove', (e) => {
@@ -500,17 +551,16 @@ window.AniTierList = (function () {
       const moveX = touch.clientX - startX;
       const moveY = touch.clientY - startY;
 
-      if (!isTouchDragging && (Math.abs(moveX) > 10 || Math.abs(moveY) > 10)) {
+      if (!isTouchDragging && (Math.abs(moveX) > 8 || Math.abs(moveY) > 8)) {
         isTouchDragging = true;
         item.classList.add('dragging');
 
-        // Create ghost element
         touchGhost = item.cloneNode(true);
         touchGhost.classList.add('touch-drag-ghost');
         touchGhost.style.position = 'fixed';
         touchGhost.style.pointerEvents = 'none';
         touchGhost.style.zIndex = '9999';
-        touchGhost.style.opacity = '0.85';
+        touchGhost.style.opacity = '0.88';
         touchGhost.style.transform = 'scale(1.1)';
         document.body.appendChild(touchGhost);
       }
@@ -537,18 +587,34 @@ window.AniTierList = (function () {
         isTouchDragging = false;
         const touch = e.changedTouches[0];
         const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-        const dropzone = elemBelow?.closest('.tier-items, .m3-unranked-grid, #unrankedGrid');
+
+        const tierRow = elemBelow?.closest('.tier-row');
+        const itemsContainer = elemBelow?.closest('.tier-items');
+        const targetItem = elemBelow?.closest('.tier-item');
+        const unrankedSurface = elemBelow?.closest('.m3-unranked-surface, #unrankedGrid, .m3-unranked-grid');
+
+        let targetTierId = null;
+        if (tierRow) targetTierId = tierRow.dataset.tierId;
+        else if (itemsContainer) targetTierId = itemsContainer.dataset.tierId;
 
         document.querySelectorAll('.tier-row').forEach(r => r.classList.remove('dragover'));
 
-        if (dropzone) {
-          const isUnranked = dropzone.classList.contains('m3-unranked-grid') || dropzone.id === 'unrankedGrid';
-          const targetTierId = isUnranked ? null : dropzone.dataset.tierId;
-
+        if (tierRow || itemsContainer || unrankedSurface) {
           const state = window.AniApp.getState();
-          const media = state.media.find(m => String(m.id) === String(draggedMediaId));
-          if (media) {
-            media.tier = targetTierId;
+          const mediaIndex = state.media.findIndex(m => String(m.id) === String(draggedMediaId));
+          if (mediaIndex !== -1) {
+            const draggedMedia = state.media[mediaIndex];
+            draggedMedia.tier = targetTierId;
+
+            if (targetItem && targetItem.dataset.mediaId && targetItem.dataset.mediaId !== String(draggedMediaId)) {
+              const targetMediaId = targetItem.dataset.mediaId;
+              const targetIndex = state.media.findIndex(m => String(m.id) === String(targetMediaId));
+              if (targetIndex !== -1) {
+                state.media.splice(mediaIndex, 1);
+                state.media.splice(targetIndex, 0, draggedMedia);
+              }
+            }
+
             window.AniApp.persist();
             renderAll();
             window.AniUI.showToast(targetTierId ? `Moved to tier ${getTierLabel(targetTierId)}` : 'Moved to unranked pool');
@@ -556,6 +622,7 @@ window.AniTierList = (function () {
         }
       }
       draggedMediaId = null;
+      draggedEl = null;
     });
   }
 

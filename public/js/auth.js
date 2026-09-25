@@ -131,15 +131,35 @@ window.AniAuth = (function () {
     return null;
   }
 
-  // Clean username from user input (handles direct username or full URL like anilist.co/user/name)
+  // Clean username from user input (handles direct username or full URL like https://anilist.co/user/oRintaroTsumugi)
   function parseUsername(input) {
     if (!input) return '';
     let str = String(input).trim();
-    if (str.includes('anilist.co/user/')) {
+
+    // Check for full or partial AniList user URL (e.g. https://anilist.co/user/oRintaroTsumugi, anilist.co/user/oRintaroTsumugi/animelist)
+    if (/anilist\.co\/user\//i.test(str)) {
       const match = str.match(/anilist\.co\/user\/([^\/\?#]+)/i);
-      if (match && match[1]) return decodeURIComponent(match[1]);
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]).trim();
+      }
     }
-    return str.replace(/^@/, '');
+
+    // Check if URL contains /user/username
+    if (/\/user\/([^\/\?#]+)/i.test(str)) {
+      const match = str.match(/\/user\/([^\/\?#]+)/i);
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]).trim();
+      }
+    }
+
+    // Strip leading https:// or http:// or www. or @ if any remaining
+    str = str.replace(/^https?:\/\/(www\.)?anilist\.co\/user\//i, '');
+    str = str.replace(/^@/, '');
+
+    // Clean trailing slashes, subpaths like /animelist or /mangalist or query params
+    str = str.split('/')[0].split('?')[0].split('#')[0];
+
+    return str.trim();
   }
 
   function onAuthChange(callback) {

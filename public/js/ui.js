@@ -53,6 +53,17 @@ window.AniUI = (function () {
     const openLoginBtn = document.getElementById('openLoginModal');
     if (openLoginBtn) openLoginBtn.addEventListener('click', () => openModal('loginModal'));
 
+    const switchUserBtn = document.getElementById('switchUserBtn');
+    if (switchUserBtn) switchUserBtn.addEventListener('click', () => openModal('loginModal'));
+
+    const heroLoginBtn = document.getElementById('heroLoginBtn');
+    if (heroLoginBtn) heroLoginBtn.addEventListener('click', () => {
+      openModal('loginModal');
+      // Switch to OAuth tab directly
+      const oauthTab = document.querySelector('.m3-dialog-tab[data-tab="oauth"]');
+      if (oauthTab) oauthTab.click();
+    });
+
     const userProfileChip = document.getElementById('userProfileChip');
     if (userProfileChip) userProfileChip.addEventListener('click', () => openModal('loginModal'));
 
@@ -172,6 +183,38 @@ window.AniUI = (function () {
   async function executeSearch(query) {
     const searchResults = document.getElementById('headerSearchResults');
     if (!searchResults) return;
+
+    // Detect if input is a user profile link (e.g. https://anilist.co/user/oRintaroTsumugi)
+    const parsedUser = window.AniAuth.parseUsername(query);
+    if (query.includes('anilist.co/user/') || query.includes('/user/')) {
+      const icons = window.AniIcons;
+      searchResults.innerHTML = `
+        <div class="search-item user-profile-search-item" style="padding: 12px; background: var(--md-sys-color-primary-container); border-radius: var(--shape-corner-md); margin: 6px; cursor: pointer;">
+          <div class="search-item-info">
+            <div class="search-item-title" style="font-weight: 700; color: var(--md-sys-color-on-primary-container);">
+              Load AniList Library for <strong>@${esc(parsedUser)}</strong>
+            </div>
+            <div class="search-item-meta" style="color: var(--md-sys-color-on-primary-container); opacity: 0.85;">
+              Click to fetch all anime/manga entries from this user profile
+            </div>
+          </div>
+          <button class="m3-btn-filled btn-sm" style="flex-shrink:0;">Load Profile</button>
+        </div>
+      `;
+      searchResults.classList.add('show');
+
+      const itemEl = searchResults.querySelector('.user-profile-search-item');
+      if (itemEl) {
+        itemEl.addEventListener('click', () => {
+          searchResults.classList.remove('show');
+          const searchInput = document.getElementById('headerSearchInput');
+          if (searchInput) searchInput.value = '';
+          window.AniUI.showToast(`Loading collection for ${parsedUser}...`);
+          window.AniApp.loadUserLibrary(parsedUser);
+        });
+      }
+      return;
+    }
 
     searchResults.innerHTML = `
       <div class="search-loading" style="padding: 16px; text-align: center; font-size: 13px; color: var(--md-sys-color-on-surface-variant);">
